@@ -184,7 +184,7 @@ export default function IndividualReportModal({ isOpen, onClose, settings, initi
           {/* Institutional Letterhead */}
           <div className="border-b-4 border-double border-slate-900 pb-4 mb-6">
             {settings?.kop_surat_r2_url ? (
-              <div className="flex justify-center mb-2">
+              <div className="flex justify-start mb-2">
                 <img
                   src={settings.kop_surat_r2_url}
                   alt="Kop Surat Resmi"
