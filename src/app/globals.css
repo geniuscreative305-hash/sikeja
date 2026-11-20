@@ -1,0 +1,183 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --bg-deep-navy: #0b2239;
+    --bg-deep-emerald: #0f3d3e;
+    --bg-dark-forest: #14533c;
+    --accent-emerald: #10b981;
+    --accent-lime: #a3e635;
+  }
+
+  body {
+    @apply text-slate-100 antialiased min-h-screen selection:bg-emerald-500/30 selection:text-emerald-200;
+    background: radial-gradient(circle at top left, #14533c 0%, #0f3d3e 40%, #0b2239 100%);
+    background-attachment: fixed;
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+  }
+}
+
+/* Glassmorphism Utilities */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
+}
+
+.glass-panel-elevated {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
+}
+
+.glass-input {
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #f8fafc;
+  transition: all 0.2s ease-in-out;
+}
+
+.glass-input:focus {
+  background: rgba(15, 23, 42, 0.85);
+  border-color: #10b981;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.25);
+  outline: none;
+}
+
+/* Custom Smooth Scrollbar */
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(11, 34, 57, 0.4);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.18);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(16, 185, 129, 0.4);
+}
+
+/* Micro-animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulseSubtle {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-pulse-subtle {
+  animation: pulseSubtle 2.5s infinite ease-in-out;
+}
+
+/* Tabular Numbers for Accurate Alignment */
+.tabular-numbers {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ==========================================================================
+   STRICT @media print RULES (A4 Official Documents & Receipts)
+   ========================================================================== */
+@media print {
+  /* Hide all interactive app elements */
+  nav,
+  aside,
+  header,
+  .no-print,
+  .sidebar,
+  button,
+  .toast-container,
+  .modal-backdrop-dark,
+  .app-navigation {
+    display: none !important;
+  }
+
+  /* Reset document root to clean, crisp white paper */
+  html,
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+    font-size: 11pt !important;
+    line-height: 1.4 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Make sure printed containers take 100% width without overflow */
+  .print-area {
+    display: block !important;
+    position: relative !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 10mm 15mm !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+    border: none !important;
+    box-shadow: none !important;
+  }
+
+  .print-area table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    color: #000000 !important;
+  }
+
+  .print-area th,
+  .print-area td {
+    border: 1px solid #111111 !important;
+    padding: 6px 8px !important;
+    color: #000000 !important;
+    font-size: 10pt !important;
+  }
+
+  .print-area th {
+    background-color: #f1f5f9 !important;
+    font-weight: 700 !important;
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 12mm;
+  }
+
+  /* Force page breaks cleanly if multi-page */
+  .page-break-after {
+    page-break-after: always;
+  }
+
+  .no-break-inside {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+}
+
