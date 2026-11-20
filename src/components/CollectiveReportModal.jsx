@@ -190,7 +190,7 @@ export default function CollectiveReportModal({ isOpen, onClose, settings }) {
                         <td className="border border-slate-400 px-2 py-1.5 text-center">{idx + 1}</td>
                         <td className="border border-slate-400 px-2 py-1.5 font-mono text-[10px]">{r.santri?.nis || '-'}</td>
                         <td className="border border-slate-400 px-2 py-1.5 font-medium text-slate-950">{r.santri?.nama_lengkap || '-'}</td>
-                        <td className="border border-slate-400 px-2 py-1.5 text-center">{r.santri?.jenjang}-{r.santri?.kelas}</td>
+                        <td className="border border-slate-400 px-2 py-1.5 text-center">{r.santri ? `${r.santri.jenjang || ''}-${r.santri.kelas || ''}` : '-'}</td>
                         <td className="border border-slate-400 px-2 py-1.5 text-center">{r.santri?.gender === 'Putra' ? 'L' : 'P'}</td>
                         <td className="border border-slate-400 px-2 py-1.5 text-right font-medium">{formatIDR(r.nominal_tagihan)}</td>
                         <td className="border border-slate-400 px-2 py-1.5 text-right">{formatIDR(r.alokasi_syahriah)}</td>
@@ -219,7 +219,7 @@ export default function CollectiveReportModal({ isOpen, onClose, settings }) {
               {/* Signatory Section (TTD Digital Cloudflare R2) */}
               <div className="mt-8 pt-4 flex justify-between items-start text-xs text-slate-800 no-break-inside">
                 <div className="w-48 text-slate-600">
-                  <p>Dicetak pada: {new Date().toLocaleDateString('id-ID', { dateStyle: 'long', timeStyle: 'short', timeZone: 'Asia/Jakarta' })} WIB</p>
+                  <p>Dicetak pada: {new Date().toLocaleString('id-ID', { dateStyle: 'long', timeStyle: 'short', timeZone: 'Asia/Jakarta' })} WIB</p>
                   <p className="mt-1">Dokumen ini diterbitkan sah oleh sistem informasi keuangan pesantren SIKEJA.</p>
                 </div>
 
