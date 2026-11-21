@@ -13,7 +13,9 @@ import {
   Loader2,
   ChevronLeft,
   ChevronRight,
-  Filter
+  Filter,
+  Upload,
+  GraduationCap
 } from 'lucide-react';
 import { formatIDR } from './DashboardView';
 
@@ -24,6 +26,8 @@ export default function SantriView({
   onOpenAddSantri, 
   onOpenEditSantri,
   onOpenDeleteConfirm,
+  onOpenExcelImport,
+  onOpenNaikKelas,
   refreshTrigger 
 }) {
   const [santriList, setSantriList] = useState([]);
@@ -31,7 +35,7 @@ export default function SantriView({
   const [search, setSearch] = useState('');
   const [jenjang, setJenjang] = useState('');
   const [gender, setGender] = useState('');
-  const [statusAktif, setStatusAktif] = useState('');
+  const [statusFilter, setStatusFilter] = useState('');
   const [page, setPage] = useState(1);
   const [pagination, setPagination] = useState({ total: 0, totalPages: 1, limit: 15 });
 
@@ -41,9 +45,9 @@ export default function SantriView({
       const token = localStorage.getItem('sikeja_token');
       let url = `/api/sikeja?type=santri&page=${page}&limit=15`;
       if (search) url += `&search=${encodeURIComponent(search)}`;
-      if (jenjang) url += `&jenjang=${jenjang}`;
-      if (gender) url += `&gender=${gender}`;
-      if (statusAktif) url += `&status_aktif=${statusAktif}`;
+      if (jenjang) url += `&jenjang=${encodeURIComponent(jenjang)}`;
+      if (gender) url += `&gender=${encodeURIComponent(gender)}`;
+      if (statusFilter) url += `&status=${encodeURIComponent(statusFilter)}`;
 
       const res = await fetch(url, {
         headers: { Authorization: `Bearer ${token}` }
@@ -62,7 +66,7 @@ export default function SantriView({
 
   useEffect(() => {
     fetchSantri();
-  }, [page, jenjang, gender, statusAktif, refreshTrigger]);
+  }, [page, jenjang, gender, statusFilter, refreshTrigger]);
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
@@ -82,18 +86,38 @@ export default function SantriView({
             </span>
           </h1>
           <p className="text-xs sm:text-sm text-slate-300 mt-1">
-            Manajemen biodata santri SMP & MA beserta monitoring status tagihan bulan berjalan.
+            Manajemen biodata santri SMP, MA, & Mahasiswa beserta monitoring status tagihan dan kenaikan kelas.
           </p>
         </div>
 
         {user?.role === 'Admin' && (
-          <button
-            onClick={onOpenAddSantri}
-            className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs transition-all shadow-lg shadow-emerald-950/40 flex items-center gap-2 self-start sm:self-auto"
-          >
-            <Plus className="w-4 h-4" />
-            <span>Tambah Santri Baru</span>
-          </button>
+          <div className="flex items-center gap-2 flex-wrap self-start sm:self-auto">
+            <button
+              onClick={onOpenExcelImport}
+              className="px-3.5 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 text-white border border-white/15 text-xs font-semibold flex items-center gap-1.5 transition-all shadow-md"
+              title="Unggah Data Santri via File Excel"
+            >
+              <Upload className="w-4 h-4 text-emerald-400" />
+              <span>Import Excel</span>
+            </button>
+
+            <button
+              onClick={onOpenNaikKelas}
+              className="px-3.5 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 text-white border border-white/15 text-xs font-semibold flex items-center gap-1.5 transition-all shadow-md"
+              title="Kenaikan Kelas Santri & Arsip Histori"
+            >
+              <GraduationCap className="w-4 h-4 text-sky-400" />
+              <span>Naik Kelas</span>
+            </button>
+
+            <button
+              onClick={onOpenAddSantri}
+              className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs transition-all shadow-lg shadow-emerald-950/40 flex items-center gap-2"
+            >
+              <Plus className="w-4 h-4" />
+              <span>Tambah Santri</span>
+            </button>
+          </div>
         )}
       </div>
 
@@ -130,6 +154,7 @@ export default function SantriView({
                 <option value="" className="bg-slate-900">Semua Jenjang</option>
                 <option value="SMP" className="bg-slate-900">Unit SMP</option>
                 <option value="MA" className="bg-slate-900">Unit MA</option>
+                <option value="Mahasiswa" className="bg-slate-900">Mahasiswa (INN)</option>
               </select>
             </div>
 
@@ -146,16 +171,17 @@ export default function SantriView({
               </select>
             </div>
 
-            {/* Status Keaktifan */}
+            {/* Status Santri (Aktif, Nonaktif, Lulus) */}
             <div className="col-span-2 sm:col-span-1">
               <select
-                value={statusAktif}
-                onChange={(e) => { setStatusAktif(e.target.value); setPage(1); }}
+                value={statusFilter}
+                onChange={(e) => { setStatusFilter(e.target.value); setPage(1); }}
                 className="w-full px-2.5 py-2 rounded-xl glass-input text-xs text-white"
               >
-                <option value="" className="bg-slate-900">Semua Status Aktif</option>
-                <option value="true" className="bg-slate-900">Aktif Saja</option>
-                <option value="false" className="bg-slate-900">Non-Aktif Saja</option>
+                <option value="" className="bg-slate-900">Semua Status</option>
+                <option value="Aktif" className="bg-slate-900">Aktif Saja</option>
+                <option value="Nonaktif" className="bg-slate-900">Non-Aktif Saja</option>
+                <option value="Lulus" className="bg-slate-900">Lulus (Alumni)</option>
               </select>
             </div>
           </div>
@@ -199,16 +225,36 @@ export default function SantriView({
                     <span className="font-mono font-medium text-slate-300 text-xs">{s.nis}</span>
                     <div className="flex items-center gap-1.5 flex-wrap justify-end">
                       <span className={`px-2 py-0.5 rounded text-[11px] font-semibold whitespace-nowrap ${
-                        s.jenjang === 'SMP' ? 'bg-emerald-500/20 text-emerald-300' : 'bg-teal-500/20 text-teal-300'
+                        s.jenjang === 'Mahasiswa'
+                          ? 'bg-sky-500/20 text-sky-300 border border-sky-500/30'
+                          : s.jenjang === 'MA'
+                          ? 'bg-teal-500/20 text-teal-300'
+                          : 'bg-emerald-500/20 text-emerald-300'
                       }`}>
                         {s.jenjang} - {s.kelas}
                       </span>
                       <span className="text-[11px] px-1.5 py-0.5 rounded bg-white/5 text-slate-300 border border-white/10 whitespace-nowrap">
                         {s.gender}
                       </span>
-                      {!s.status_aktif && (
-                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-red-500/20 text-red-400 border border-red-500/30 whitespace-nowrap">
+                      {s.status === 'Lulus' ? (
+                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-sky-500/20 text-sky-300 border border-sky-500/30 whitespace-nowrap">
+                          🎓 Lulus
+                        </span>
+                      ) : (s.status === 'Nonaktif' || !s.status_aktif) ? (
+                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 whitespace-nowrap">
                           Non-Aktif
+                        </span>
+                      ) : (
+                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 whitespace-nowrap">
+                          Aktif
+                        </span>
+                      )}
+                      {Array.isArray(s.riwayat_kelas) && s.riwayat_kelas.length > 0 && (
+                        <span 
+                          className="text-[10px] px-1.5 py-0.5 rounded bg-white/5 text-slate-400 border border-white/10 whitespace-nowrap"
+                          title={s.riwayat_kelas.map(r => `${r.tahun_ajaran || ''}: ${r.dari_kelas} → ${r.ke_kelas}`).join('\n')}
+                        >
+                          Histori: {s.riwayat_kelas.length}x
                         </span>
                       )}
                     </div>
@@ -333,15 +379,37 @@ export default function SantriView({
                       </td>
                       <td className="py-3.5 px-4">
                         <div className="font-bold text-white text-sm whitespace-nowrap">{s.nama_lengkap}</div>
-                        {!s.status_aktif && (
-                          <span className="text-[10px] px-1.5 py-0.2 rounded bg-red-500/20 text-red-400 border border-red-500/30 whitespace-nowrap">
-                            Non-Aktif
-                          </span>
-                        )}
+                        <div className="flex items-center gap-1.5 mt-0.5">
+                          {s.status === 'Lulus' ? (
+                            <span className="text-[10px] px-1.5 py-0.2 rounded bg-sky-500/20 text-sky-300 border border-sky-500/30 whitespace-nowrap">
+                              🎓 Lulus
+                            </span>
+                          ) : (s.status === 'Nonaktif' || !s.status_aktif) ? (
+                            <span className="text-[10px] px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 whitespace-nowrap">
+                              Non-Aktif
+                            </span>
+                          ) : (
+                            <span className="text-[10px] px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 whitespace-nowrap">
+                              Aktif
+                            </span>
+                          )}
+                          {Array.isArray(s.riwayat_kelas) && s.riwayat_kelas.length > 0 && (
+                            <span 
+                              className="text-[10px] px-1.5 py-0.2 rounded bg-white/5 text-slate-400 border border-white/10 whitespace-nowrap"
+                              title={s.riwayat_kelas.map(r => `${r.tahun_ajaran || ''}: ${r.dari_kelas} → ${r.ke_kelas}`).join('\n')}
+                            >
+                              Histori: {s.riwayat_kelas.length}x
+                            </span>
+                          )}
+                        </div>
                       </td>
                       <td className="py-3.5 px-4 text-center whitespace-nowrap">
                         <span className={`px-2 py-0.5 rounded text-[11px] font-semibold whitespace-nowrap ${
-                          s.jenjang === 'SMP' ? 'bg-emerald-500/20 text-emerald-300' : 'bg-teal-500/20 text-teal-300'
+                          s.jenjang === 'Mahasiswa'
+                            ? 'bg-sky-500/20 text-sky-300 border border-sky-500/30'
+                            : s.jenjang === 'MA'
+                            ? 'bg-teal-500/20 text-teal-300'
+                            : 'bg-emerald-500/20 text-emerald-300'
                         }`}>
                           {s.jenjang} - {s.kelas}
                         </span>

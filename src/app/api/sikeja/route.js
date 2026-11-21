@@ -221,6 +221,8 @@ export async function GET(request) {
       let smpLunas = 0;
       let maTotal = 0;
       let maLunas = 0;
+      let mahasiswaTotal = 0;
+      let mahasiswaLunas = 0;
 
       (currentMonthBills || []).forEach((bill) => {
         const isLunas = bill.status_bayar === 'Lunas';
@@ -233,6 +235,9 @@ export async function GET(request) {
         } else if (jenjang === 'MA') {
           maTotal += 1;
           if (isLunas) maLunas += 1;
+        } else if (jenjang === 'Mahasiswa') {
+          mahasiswaTotal += 1;
+          if (isLunas) mahasiswaLunas += 1;
         }
       });
 
@@ -242,6 +247,7 @@ export async function GET(request) {
 
       const smpRatio = smpTotal > 0 ? Math.round((smpLunas / smpTotal) * 100) : 0;
       const maRatio = maTotal > 0 ? Math.round((maLunas / maTotal) * 100) : 0;
+      const mahasiswaRatio = mahasiswaTotal > 0 ? Math.round((mahasiswaLunas / mahasiswaTotal) * 100) : 0;
 
       // Quarterly / 3-month trend
       const monthsTrend = [];
@@ -293,6 +299,12 @@ export async function GET(request) {
           lunas: maLunas,
           nunggak: maTotal - maLunas,
           percentage: maRatio,
+        },
+        mahasiswa_comparison: {
+          total: mahasiswaTotal,
+          lunas: mahasiswaLunas,
+          nunggak: mahasiswaTotal - mahasiswaLunas,
+          percentage: mahasiswaRatio,
         },
         quarterly_trend: monthsTrend,
       });
@@ -421,6 +433,7 @@ export async function GET(request) {
       const search = searchParams.get('search') || '';
       const jenjang = searchParams.get('jenjang') || '';
       const gender = searchParams.get('gender') || '';
+      const status = searchParams.get('status') || '';
       const status_aktif = searchParams.get('status_aktif');
 
       let query = supabaseAdmin
@@ -436,7 +449,9 @@ export async function GET(request) {
       if (gender) {
         query = query.eq('gender', gender);
       }
-      if (status_aktif !== null && status_aktif !== undefined && status_aktif !== '') {
+      if (status) {
+        query = query.eq('status', status);
+      } else if (status_aktif !== null && status_aktif !== undefined && status_aktif !== '') {
         query = query.eq('status_aktif', status_aktif === 'true');
       }
 
@@ -550,6 +565,8 @@ export async function GET(request) {
       const month = parseInt(searchParams.get('month') || String(new Date().getMonth() + 1), 10);
       const year = parseInt(searchParams.get('year') || String(new Date().getFullYear()), 10);
       const jenjang = searchParams.get('jenjang') || '';
+      const gender = searchParams.get('gender') || '';
+      const kelas = searchParams.get('kelas') || '';
       const status_bayar = searchParams.get('status_bayar') || '';
 
       let query = supabaseAdmin
@@ -591,6 +608,12 @@ export async function GET(request) {
       if (jenjang) {
         filtered = filtered.filter((r) => r.santri?.jenjang === jenjang);
       }
+      if (gender) {
+        filtered = filtered.filter((r) => r.santri?.gender === gender);
+      }
+      if (kelas) {
+        filtered = filtered.filter((r) => r.santri?.kelas === kelas);
+      }
 
       const settings = await getSettingsMap();
 
@@ -598,6 +621,8 @@ export async function GET(request) {
         month,
         year,
         jenjang,
+        gender,
+        kelas,
         status_bayar,
         settings,
         total_records: filtered.length,
@@ -768,7 +793,7 @@ export async function POST(request) {
       const { data: activeStudents, error: sErr } = await supabaseAdmin
         .from('santri')
         .select('*')
-        .eq('status_aktif', true);
+        .or('status.eq.Aktif,and(status.is.null,status_aktif.eq.true)');
 
       if (sErr || !activeStudents) {
         return NextResponse.json({ error: sErr?.message || 'Gagal mengambil data santri.' }, { status: 500 });
@@ -909,22 +934,25 @@ export async function POST(request) {
 
         if (!curBill) continue;
 
-        const alokasiSyahriah = Math.min(payAmount, syahriahTariff);
-        const alokasiMakan = Math.min(Math.max(0, payAmount - syahriahTariff), makanTariff);
-        const nominalBayarFinal = payAmount;
-        const sisaTunggakan = Math.max(0, parseFloat(curBill.nominal_tagihan) - nominalBayarFinal);
+        const prevBayar = parseFloat(curBill.nominal_bayar) || 0;
+        const nominalTagihan = parseFloat(curBill.nominal_tagihan) || 0;
+        const totalBayar = prevBayar + payAmount;
+        const sisaTunggakan = Math.max(0, nominalTagihan - totalBayar);
+
+        const alokasiSyahriah = Math.min(totalBayar, syahriahTariff);
+        const alokasiMakan = Math.min(Math.max(0, totalBayar - syahriahTariff), makanTariff);
 
         let statusBayar = 'Belum Bayar';
-        if (sisaTunggakan === 0 && nominalBayarFinal >= parseFloat(curBill.nominal_tagihan)) {
+        if (sisaTunggakan === 0 && totalBayar >= nominalTagihan) {
           statusBayar = 'Lunas';
-        } else if (nominalBayarFinal > 0) {
+        } else if (totalBayar > 0) {
           statusBayar = 'Sebagian';
         }
 
         const { data: updated, error: uErr } = await supabaseAdmin
           .from('transaksi')
           .update({
-            nominal_bayar: nominalBayarFinal,
+            nominal_bayar: totalBayar,
             alokasi_syahriah: alokasiSyahriah,
             alokasi_makan: alokasiMakan,
             sisa_tunggakan: sisaTunggakan,
@@ -1010,6 +1038,7 @@ export async function POST(request) {
         kelas,
         nama_wali,
         no_hp,
+        status,
         status_aktif,
       } = body;
 
@@ -1020,6 +1049,8 @@ export async function POST(request) {
         );
       }
 
+      const finalStatus = status || (status_aktif === false ? 'Nonaktif' : 'Aktif');
+
       const payload = {
         nis,
         nama_lengkap,
@@ -1028,7 +1059,8 @@ export async function POST(request) {
         kelas,
         nama_wali: nama_wali || '',
         no_hp: no_hp || '',
-        status_aktif: status_aktif !== undefined ? Boolean(status_aktif) : true,
+        status: finalStatus,
+        status_aktif: finalStatus === 'Aktif',
       };
 
       let result;
@@ -1055,6 +1087,105 @@ export async function POST(request) {
         success: true,
         message: id ? 'Data santri berhasil diperbarui.' : 'Santri baru berhasil ditambahkan.',
         santri: result,
+      });
+    }
+
+    // ------------------------------------------------------------------------
+    // ACTION: IMPORT_EXCEL_SANTRI (Batch upload santri from .xlsx)
+    // ------------------------------------------------------------------------
+    if (action === 'import_excel_santri') {
+      const { santri_list } = body;
+      if (!Array.isArray(santri_list) || santri_list.length === 0) {
+        return NextResponse.json({ error: 'Data santri dari file Excel tidak ditemukan.' }, { status: 400 });
+      }
+
+      const rowsToInsert = santri_list.map((s) => {
+        const finalStatus = s.status || 'Aktif';
+        return {
+          nis: String(s.nis).trim(),
+          nama_lengkap: String(s.nama_lengkap).trim(),
+          gender: s.gender || 'Putra',
+          jenjang: s.jenjang || 'SMP',
+          kelas: String(s.kelas).trim(),
+          nama_wali: s.nama_wali || '',
+          no_hp: s.no_hp || '',
+          status: finalStatus,
+          status_aktif: finalStatus === 'Aktif',
+          riwayat_kelas: [],
+        };
+      });
+
+      const { data: inserted, error: insErr } = await supabaseAdmin
+        .from('santri')
+        .upsert(rowsToInsert, { onConflict: 'nis' })
+        .select();
+
+      if (insErr) {
+        return NextResponse.json({ error: insErr.message }, { status: 500 });
+      }
+
+      return NextResponse.json({
+        success: true,
+        message: `Berhasil mengimpor dan menyinkronkan ${inserted?.length || rowsToInsert.length} data santri ke sistem.`,
+        count: inserted?.length || rowsToInsert.length,
+      });
+    }
+
+    // ------------------------------------------------------------------------
+    // ACTION: NAIK_KELAS (Promotion & Academic History Archiving)
+    // ------------------------------------------------------------------------
+    if (action === 'naik_kelas') {
+      const { santri_ids, ke_kelas, ke_jenjang, tahun_ajaran, status_baru } = body;
+      if (!Array.isArray(santri_ids) || santri_ids.length === 0) {
+        return NextResponse.json({ error: 'Pilih minimal 1 santri untuk dipromosikan.' }, { status: 400 });
+      }
+
+      const { data: students, error: fErr } = await supabaseAdmin
+        .from('santri')
+        .select('id, kelas, jenjang, status, riwayat_kelas')
+        .in('id', santri_ids);
+
+      if (fErr || !students) {
+        return NextResponse.json({ error: fErr?.message || 'Gagal memuat data santri terpilih.' }, { status: 500 });
+      }
+
+      const targetStatus = status_baru || (ke_kelas.toLowerCase().includes('lulus') ? 'Lulus' : 'Aktif');
+
+      let successCount = 0;
+      for (const st of students) {
+        const pastHistory = Array.isArray(st.riwayat_kelas) ? st.riwayat_kelas : [];
+        const newHistoryEntry = {
+          dari_kelas: st.kelas,
+          dari_jenjang: st.jenjang,
+          ke_kelas: ke_kelas,
+          ke_jenjang: ke_jenjang || st.jenjang,
+          tahun_ajaran: tahun_ajaran || '-',
+          status: targetStatus,
+          tanggal: new Date().toISOString(),
+        };
+
+        const updatedHistory = [...pastHistory, newHistoryEntry];
+
+        const updatePayload = {
+          kelas: ke_kelas,
+          jenjang: ke_jenjang || st.jenjang,
+          status: targetStatus,
+          status_aktif: targetStatus === 'Aktif',
+          riwayat_kelas: updatedHistory,
+        };
+
+        const { error: uErr } = await supabaseAdmin
+          .from('santri')
+          .update(updatePayload)
+          .eq('id', st.id);
+
+        if (!uErr) successCount++;
+      }
+
+      return NextResponse.json({
+        success: true,
+        message: `Berhasil memproses kenaikan kelas / kelulusan untuk ${successCount} santri. Histori kelas lama tersimpan sebagai arsip.`,
+        processed_count: successCount,
       });
     }
 

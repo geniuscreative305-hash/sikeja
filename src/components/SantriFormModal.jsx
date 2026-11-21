@@ -9,7 +9,7 @@ export default function SantriFormModal({ isOpen, onClose, onSuccess, addToast, 
   const [kelas, setKelas] = useState('');
   const [namaWali, setNamaWali] = useState('');
   const [noHp, setNoHp] = useState('');
-  const [statusAktif, setStatusAktif] = useState(true);
+  const [status, setStatus] = useState('Aktif');
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -21,7 +21,10 @@ export default function SantriFormModal({ isOpen, onClose, onSuccess, addToast, 
       setKelas(editingSantri.kelas || '');
       setNamaWali(editingSantri.nama_wali || '');
       setNoHp(editingSantri.no_hp || '');
-      setStatusAktif(editingSantri.status_aktif !== undefined ? editingSantri.status_aktif : true);
+      setStatus(
+        editingSantri.status ||
+        (editingSantri.status_aktif === false ? 'Nonaktif' : 'Aktif')
+      );
     } else {
       // Auto recommend NIS format with current year
       const y = new Date().getFullYear();
@@ -32,7 +35,7 @@ export default function SantriFormModal({ isOpen, onClose, onSuccess, addToast, 
       setKelas('7-A');
       setNamaWali('');
       setNoHp('');
-      setStatusAktif(true);
+      setStatus('Aktif');
     }
   }, [editingSantri, isOpen]);
 
@@ -64,7 +67,8 @@ export default function SantriFormModal({ isOpen, onClose, onSuccess, addToast, 
           kelas: kelas.trim(),
           nama_wali: namaWali.trim(),
           no_hp: noHp.trim(),
-          status_aktif: statusAktif,
+          status,
+          status_aktif: status === 'Aktif',
         }),
       });
 
@@ -162,6 +166,7 @@ export default function SantriFormModal({ isOpen, onClose, onSuccess, addToast, 
               >
                 <option value="SMP" className="bg-slate-900">SMP (Sekolah Menengah Pertama)</option>
                 <option value="MA" className="bg-slate-900">MA (Madrasah Aliyah)</option>
+                <option value="Mahasiswa" className="bg-slate-900">Mahasiswa (Perguruan Tinggi / INN)</option>
               </select>
             </div>
 
@@ -208,22 +213,48 @@ export default function SantriFormModal({ isOpen, onClose, onSuccess, addToast, 
             </div>
           </div>
 
-          <div className="p-3.5 rounded-xl bg-white/[0.04] border border-white/10 flex items-center justify-between">
+          <div className="p-3.5 rounded-xl bg-white/[0.04] border border-white/10 space-y-2">
             <div>
-              <div className="text-xs font-bold text-white">Status Keaktifan Santri</div>
+              <div className="text-xs font-bold text-white">Status Santri di Pesantren</div>
               <div className="text-[11px] text-slate-400">
-                Santri aktif akan diikutsertakan dalam tagihan bulanan otomatis
+                Pilih status keaktifan akademik untuk menentukan tagihan bulanan
               </div>
             </div>
-            <label className="relative inline-flex items-center cursor-pointer">
-              <input
-                type="checkbox"
-                checked={statusAktif}
-                onChange={(e) => setStatusAktif(e.target.checked)}
-                className="sr-only peer"
-              />
-              <div className="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
-            </label>
+            <div className="grid grid-cols-3 gap-2 pt-1">
+              <button
+                type="button"
+                onClick={() => setStatus('Aktif')}
+                className={`py-2 px-3 rounded-xl text-xs font-semibold border transition-all text-center ${
+                  status === 'Aktif'
+                    ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/50 shadow-md shadow-emerald-950/40'
+                    : 'bg-white/[0.02] text-slate-400 border-white/10 hover:bg-white/5 hover:text-white'
+                }`}
+              >
+                ● Aktif
+              </button>
+              <button
+                type="button"
+                onClick={() => setStatus('Nonaktif')}
+                className={`py-2 px-3 rounded-xl text-xs font-semibold border transition-all text-center ${
+                  status === 'Nonaktif'
+                    ? 'bg-amber-500/20 text-amber-300 border-amber-500/50 shadow-md shadow-amber-950/40'
+                    : 'bg-white/[0.02] text-slate-400 border-white/10 hover:bg-white/5 hover:text-white'
+                }`}
+              >
+                ○ Nonaktif
+              </button>
+              <button
+                type="button"
+                onClick={() => setStatus('Lulus')}
+                className={`py-2 px-3 rounded-xl text-xs font-semibold border transition-all text-center ${
+                  status === 'Lulus'
+                    ? 'bg-sky-500/20 text-sky-300 border-sky-500/50 shadow-md shadow-sky-950/40'
+                    : 'bg-white/[0.02] text-slate-400 border-white/10 hover:bg-white/5 hover:text-white'
+                }`}
+              >
+                🎓 Lulus (Alumni)
+              </button>
+            </div>
           </div>
 
           <div className="flex items-center justify-end gap-3 pt-4 border-t border-white/10">

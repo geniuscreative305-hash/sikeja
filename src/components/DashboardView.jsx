@@ -173,7 +173,7 @@ export default function DashboardView({
 
       {/* Grid: SMP vs MA Comparison + Quarterly Trend Chart */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* SMP vs MA Comparison Widget */}
+        {/* Comparison Widget */}
         <div className="lg:col-span-6 glass-panel rounded-2xl p-6 space-y-6">
           <div className="flex items-center justify-between pb-3 border-b border-white/10">
             <div className="flex items-center gap-2.5">
@@ -181,69 +181,99 @@ export default function DashboardView({
                 <GraduationCap className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="font-bold text-white text-base">Komparasi Unit: SMP vs MA</h3>
+                <h3 className="font-bold text-white text-base">Komparasi Kelunasan per Jenjang</h3>
                 <p className="text-xs text-slate-400">Rasio kelunasan tagihan santri bulan {currentMonthName}</p>
               </div>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             {/* Unit SMP Card */}
-            <div className="p-4 rounded-xl bg-white/[0.04] border border-white/10 space-y-3">
+            <div className="p-3.5 rounded-xl bg-white/[0.04] border border-white/10 space-y-2.5">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold px-2.5 py-1 rounded-md bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                <span className="text-xs font-bold px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
                   Unit SMP
                 </span>
-                <span className="text-lg font-extrabold text-white tabular-numbers">
+                <span className="text-base font-extrabold text-white tabular-numbers">
                   {stats?.smp_comparison?.percentage || 0}%
                 </span>
               </div>
 
-              <div className="w-full bg-white/10 rounded-full h-2 overflow-hidden">
+              <div className="w-full bg-white/10 rounded-full h-1.5 overflow-hidden">
                 <div 
                   className="bg-emerald-400 h-full rounded-full transition-all duration-500"
                   style={{ width: `${stats?.smp_comparison?.percentage || 0}%` }}
                 />
               </div>
 
-              <div className="flex items-center justify-between text-xs pt-1">
+              <div className="flex items-center justify-between text-[11px] pt-0.5">
                 <span className="text-emerald-400 flex items-center gap-1">
-                  <CheckCircle2 className="w-3.5 h-3.5" />
+                  <CheckCircle2 className="w-3 h-3" />
                   <span>{stats?.smp_comparison?.lunas || 0} Lunas</span>
                 </span>
                 <span className="text-amber-400 flex items-center gap-1">
-                  <Clock className="w-3.5 h-3.5" />
+                  <Clock className="w-3 h-3" />
                   <span>{stats?.smp_comparison?.nunggak || 0} Nunggak</span>
                 </span>
               </div>
             </div>
 
             {/* Unit MA Card */}
-            <div className="p-4 rounded-xl bg-white/[0.04] border border-white/10 space-y-3">
+            <div className="p-3.5 rounded-xl bg-white/[0.04] border border-white/10 space-y-2.5">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold px-2.5 py-1 rounded-md bg-teal-500/20 text-teal-300 border border-teal-500/30">
+                <span className="text-xs font-bold px-2 py-0.5 rounded-md bg-teal-500/20 text-teal-300 border border-teal-500/30">
                   Unit MA
                 </span>
-                <span className="text-lg font-extrabold text-white tabular-numbers">
+                <span className="text-base font-extrabold text-white tabular-numbers">
                   {stats?.ma_comparison?.percentage || 0}%
                 </span>
               </div>
 
-              <div className="w-full bg-white/10 rounded-full h-2 overflow-hidden">
+              <div className="w-full bg-white/10 rounded-full h-1.5 overflow-hidden">
                 <div 
                   className="bg-teal-400 h-full rounded-full transition-all duration-500"
                   style={{ width: `${stats?.ma_comparison?.percentage || 0}%` }}
                 />
               </div>
 
-              <div className="flex items-center justify-between text-xs pt-1">
+              <div className="flex items-center justify-between text-[11px] pt-0.5">
                 <span className="text-teal-400 flex items-center gap-1">
-                  <CheckCircle2 className="w-3.5 h-3.5" />
+                  <CheckCircle2 className="w-3 h-3" />
                   <span>{stats?.ma_comparison?.lunas || 0} Lunas</span>
                 </span>
                 <span className="text-amber-400 flex items-center gap-1">
-                  <Clock className="w-3.5 h-3.5" />
+                  <Clock className="w-3 h-3" />
                   <span>{stats?.ma_comparison?.nunggak || 0} Nunggak</span>
+                </span>
+              </div>
+            </div>
+
+            {/* Unit Mahasiswa Card */}
+            <div className="p-3.5 rounded-xl bg-white/[0.04] border border-white/10 space-y-2.5">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold px-2 py-0.5 rounded-md bg-sky-500/20 text-sky-300 border border-sky-500/30">
+                  Mahasiswa
+                </span>
+                <span className="text-base font-extrabold text-white tabular-numbers">
+                  {stats?.mahasiswa_comparison?.percentage || 0}%
+                </span>
+              </div>
+
+              <div className="w-full bg-white/10 rounded-full h-1.5 overflow-hidden">
+                <div 
+                  className="bg-sky-400 h-full rounded-full transition-all duration-500"
+                  style={{ width: `${stats?.mahasiswa_comparison?.percentage || 0}%` }}
+                />
+              </div>
+
+              <div className="flex items-center justify-between text-[11px] pt-0.5">
+                <span className="text-sky-400 flex items-center gap-1">
+                  <CheckCircle2 className="w-3 h-3" />
+                  <span>{stats?.mahasiswa_comparison?.lunas || 0} Lunas</span>
+                </span>
+                <span className="text-amber-400 flex items-center gap-1">
+                  <Clock className="w-3 h-3" />
+                  <span>{stats?.mahasiswa_comparison?.nunggak || 0} Nunggak</span>
                 </span>
               </div>
             </div>

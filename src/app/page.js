@@ -19,6 +19,8 @@ import KwitansiModal from '@/components/KwitansiModal';
 import CollectiveReportModal from '@/components/CollectiveReportModal';
 import IndividualReportModal from '@/components/IndividualReportModal';
 import SantriFormModal from '@/components/SantriFormModal';
+import ExcelImportModal from '@/components/ExcelImportModal';
+import NaikKelasModal from '@/components/NaikKelasModal';
 
 import { 
   Building2, 
@@ -61,6 +63,8 @@ export default function AppRoot() {
   const [individualSantriId, setIndividualSantriId] = useState(null);
   const [isSantriModalOpen, setIsSantriModalOpen] = useState(false);
   const [editingSantri, setEditingSantri] = useState(null);
+  const [isExcelImportOpen, setIsExcelImportOpen] = useState(false);
+  const [isNaikKelasOpen, setIsNaikKelasOpen] = useState(false);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
   const [deletingSantri, setDeletingSantri] = useState(null);
 
@@ -367,6 +371,8 @@ export default function AppRoot() {
                 setDeletingSantri(s);
                 setIsDeleteConfirmOpen(true);
               }}
+              onOpenExcelImport={() => setIsExcelImportOpen(true)}
+              onOpenNaikKelas={() => setIsNaikKelasOpen(true)}
               refreshTrigger={refreshTrigger}
             />
           )}
@@ -459,6 +465,20 @@ export default function AppRoot() {
           setIsDeleteConfirmOpen(false);
           setDeletingSantri(null);
         }}
+      />
+
+      <ExcelImportModal
+        isOpen={isExcelImportOpen}
+        onClose={() => setIsExcelImportOpen(false)}
+        onSuccess={handleDataMutationSuccess}
+        addToast={addToast}
+      />
+
+      <NaikKelasModal
+        isOpen={isNaikKelasOpen}
+        onClose={() => setIsNaikKelasOpen(false)}
+        onSuccess={handleDataMutationSuccess}
+        addToast={addToast}
       />
 
       {/* Global Toast Container */}

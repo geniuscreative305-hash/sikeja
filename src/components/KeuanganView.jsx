@@ -356,6 +356,7 @@ export default function KeuanganView({
                 <option value="" className="bg-slate-900">Semua Jenjang</option>
                 <option value="SMP" className="bg-slate-900">Unit SMP</option>
                 <option value="MA" className="bg-slate-900">Unit MA</option>
+                <option value="Mahasiswa" className="bg-slate-900">Mahasiswa (INN)</option>
               </select>
             </div>
 

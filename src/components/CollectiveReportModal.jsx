@@ -7,6 +7,8 @@ export default function CollectiveReportModal({ isOpen, onClose, settings }) {
   const [month, setMonth] = useState(now.getMonth() + 1);
   const [year, setYear] = useState(now.getFullYear());
   const [jenjang, setJenjang] = useState('');
+  const [gender, setGender] = useState('');
+  const [kelas, setKelas] = useState('');
   const [statusBayar, setStatusBayar] = useState('');
   const [reportData, setReportData] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -23,8 +25,10 @@ export default function CollectiveReportModal({ isOpen, onClose, settings }) {
       try {
         const token = localStorage.getItem('sikeja_token');
         let url = `/api/sikeja?type=collective_report&month=${month}&year=${year}`;
-        if (jenjang) url += `&jenjang=${jenjang}`;
-        if (statusBayar) url += `&status_bayar=${statusBayar}`;
+        if (jenjang) url += `&jenjang=${encodeURIComponent(jenjang)}`;
+        if (gender) url += `&gender=${encodeURIComponent(gender)}`;
+        if (kelas) url += `&kelas=${encodeURIComponent(kelas)}`;
+        if (statusBayar) url += `&status_bayar=${encodeURIComponent(statusBayar)}`;
 
         const res = await fetch(url, {
           headers: { Authorization: `Bearer ${token}` }
@@ -38,7 +42,7 @@ export default function CollectiveReportModal({ isOpen, onClose, settings }) {
       }
     }
     fetchReport();
-  }, [isOpen, month, year, jenjang, statusBayar]);
+  }, [isOpen, month, year, jenjang, gender, kelas, statusBayar]);
 
   if (!isOpen) return null;
 
@@ -73,7 +77,7 @@ export default function CollectiveReportModal({ isOpen, onClose, settings }) {
       {/* Main Document Container */}
       <div className="w-full max-w-5xl my-8">
         {/* Filter Controls (Hidden when printing) */}
-        <div className="glass-panel p-4 rounded-2xl mb-4 text-white flex flex-wrap items-center gap-3 no-print">
+        <div className="glass-panel p-4 rounded-2xl mb-4 text-white flex flex-wrap items-center gap-2.5 no-print">
           <div className="flex items-center gap-1.5 text-xs font-semibold text-emerald-400">
             <Filter className="w-4 h-4" />
             <span>Filter Laporan:</span>
@@ -95,15 +99,36 @@ export default function CollectiveReportModal({ isOpen, onClose, settings }) {
             onChange={(e) => setYear(parseInt(e.target.value, 10))}
             className="w-20 px-3 py-1.5 rounded-lg glass-input text-xs text-white"
           />
+          {/* Jenjang Filter */}
           <select
             value={jenjang}
             onChange={(e) => setJenjang(e.target.value)}
             className="px-3 py-1.5 rounded-lg glass-input text-xs text-white"
           >
-            <option value="" className="bg-slate-900">Semua Jenjang (SMP & MA)</option>
-            <option value="SMP" className="bg-slate-900">Hanya SMP</option>
-            <option value="MA" className="bg-slate-900">Hanya MA</option>
+            <option value="" className="bg-slate-900">Semua Jenjang</option>
+            <option value="SMP" className="bg-slate-900">Unit SMP</option>
+            <option value="MA" className="bg-slate-900">Unit MA</option>
+            <option value="Mahasiswa" className="bg-slate-900">Mahasiswa (INN)</option>
           </select>
+          {/* Gender Filter */}
+          <select
+            value={gender}
+            onChange={(e) => setGender(e.target.value)}
+            className="px-3 py-1.5 rounded-lg glass-input text-xs text-white"
+          >
+            <option value="" className="bg-slate-900">Semua Gender</option>
+            <option value="Putra" className="bg-slate-900">Putra (Santri)</option>
+            <option value="Putri" className="bg-slate-900">Putri (Santriwati)</option>
+          </select>
+          {/* Kelas Filter */}
+          <input
+            type="text"
+            value={kelas}
+            onChange={(e) => setKelas(e.target.value)}
+            placeholder="Filter Kelas (opsional)"
+            className="w-36 px-3 py-1.5 rounded-lg glass-input text-xs text-white placeholder-slate-400"
+          />
+          {/* Status Bayar Filter */}
           <select
             value={statusBayar}
             onChange={(e) => setStatusBayar(e.target.value)}
@@ -151,6 +176,8 @@ export default function CollectiveReportModal({ isOpen, onClose, settings }) {
             <p className="text-xs text-slate-700 mt-1">
               Periode: <strong>{monthNames[month - 1]} {year}</strong>
               {jenjang ? ` • Unit: ${jenjang}` : ' • Unit: Seluruh Jenjang'}
+              {gender ? ` • Gender: ${gender}` : ''}
+              {kelas ? ` • Kelas: ${kelas}` : ''}
               {statusBayar ? ` • Status: ${statusBayar}` : ''}
             </p>
           </div>

@@ -139,20 +139,27 @@ export default function MultiMonthPayModal({
     .filter((b) => selectedBillIds.has(b.id))
     .map((b) => {
       const payAmount = parseFloat(billPayments[b.id]) || 0;
-      // Auto allocation:
-      const alokasiSyahriah = Math.min(payAmount, syahriahTariff);
-      const alokasiMakan = Math.min(Math.max(0, payAmount - syahriahTariff), makanTariff);
-      const sisaTunggakan = Math.max(0, parseFloat(b.nominal_tagihan) - payAmount);
+      const prevPaid = parseFloat(b.nominal_bayar) || 0;
+      const nominalTagihan = parseFloat(b.nominal_tagihan) || 0;
+      const totalPaidAfter = prevPaid + payAmount;
+      const sisaTunggakan = Math.max(0, nominalTagihan - totalPaidAfter);
+
+      // Auto allocation based on total paid after transaction:
+      const alokasiSyahriah = Math.min(totalPaidAfter, syahriahTariff);
+      const alokasiMakan = Math.min(Math.max(0, totalPaidAfter - syahriahTariff), makanTariff);
+
       let status = 'Belum Bayar';
-      if (sisaTunggakan === 0 && payAmount >= parseFloat(b.nominal_tagihan)) {
+      if (sisaTunggakan === 0 && totalPaidAfter >= nominalTagihan) {
         status = 'Lunas';
-      } else if (payAmount > 0) {
+      } else if (totalPaidAfter > 0) {
         status = 'Sebagian';
       }
 
       return {
         bill: b,
         payAmount,
+        prevPaid,
+        totalPaidAfter,
         alokasiSyahriah,
         alokasiMakan,
         sisaTunggakan,
@@ -355,8 +362,8 @@ export default function MultiMonthPayModal({
                             <input
                               type="number"
                               min="0"
-                              max={parseFloat(bill.nominal_tagihan)}
-                              value={billPayments[bill.id] !== undefined ? billPayments[bill.id] : bill.sisa_tunggakan}
+                              max={parseFloat(bill.sisa_tunggakan !== undefined ? bill.sisa_tunggakan : bill.nominal_tagihan)}
+                              value={billPayments[bill.id] !== undefined ? billPayments[bill.id] : (bill.sisa_tunggakan || bill.nominal_tagihan)}
                               onChange={(e) => handlePaymentChange(bill.id, e.target.value)}
                               className="w-32 px-2.5 py-1.5 rounded-lg glass-input text-xs font-semibold text-right tabular-numbers text-emerald-300"
                             />
