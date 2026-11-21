@@ -98,8 +98,8 @@ export default function SantriView({
       </div>
 
       {/* Filter and Search Bar */}
-      <div className="glass-panel p-4 rounded-2xl space-y-3">
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-3">
+      <div className="glass-panel p-3.5 sm:p-4 rounded-2xl space-y-3">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-2.5 sm:gap-3">
           {/* Search Box */}
           <form onSubmit={handleSearchSubmit} className="md:col-span-5 relative">
             <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
@@ -108,63 +108,184 @@ export default function SantriView({
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Cari nama santri, NIS, atau kelas..."
-              className="w-full pl-10 pr-20 py-2 rounded-xl glass-input text-xs text-white placeholder-slate-400"
+              className="w-full pl-10 pr-20 py-2.5 sm:py-2 rounded-xl glass-input text-xs text-white placeholder-slate-400"
             />
             <button
               type="submit"
-              className="absolute right-1.5 top-1/2 -translate-y-1/2 px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-white text-[11px] font-semibold transition-colors"
+              className="absolute right-1.5 top-1/2 -translate-y-1/2 px-2.5 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white text-[11px] font-semibold transition-colors"
             >
               Cari
             </button>
           </form>
 
-          {/* Jenjang Filter */}
-          <div className="md:col-span-2">
-            <select
-              value={jenjang}
-              onChange={(e) => { setJenjang(e.target.value); setPage(1); }}
-              className="w-full px-3 py-2 rounded-xl glass-input text-xs text-white"
-            >
-              <option value="" className="bg-slate-900">Semua Jenjang</option>
-              <option value="SMP" className="bg-slate-900">Unit SMP</option>
-              <option value="MA" className="bg-slate-900">Unit MA</option>
-            </select>
-          </div>
+          {/* Filters Grid for Mobile (2 cols on mobile, 7 cols on desktop) */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:col-span-7 gap-2">
+            {/* Jenjang Filter */}
+            <div>
+              <select
+                value={jenjang}
+                onChange={(e) => { setJenjang(e.target.value); setPage(1); }}
+                className="w-full px-2.5 py-2 rounded-xl glass-input text-xs text-white"
+              >
+                <option value="" className="bg-slate-900">Semua Jenjang</option>
+                <option value="SMP" className="bg-slate-900">Unit SMP</option>
+                <option value="MA" className="bg-slate-900">Unit MA</option>
+              </select>
+            </div>
 
-          {/* Gender Filter */}
-          <div className="md:col-span-2">
-            <select
-              value={gender}
-              onChange={(e) => { setGender(e.target.value); setPage(1); }}
-              className="w-full px-3 py-2 rounded-xl glass-input text-xs text-white"
-            >
-              <option value="" className="bg-slate-900">Semua Gender</option>
-              <option value="Putra" className="bg-slate-900">Putra (Santri)</option>
-              <option value="Putri" className="bg-slate-900">Putri (Santriwati)</option>
-            </select>
-          </div>
+            {/* Gender Filter */}
+            <div>
+              <select
+                value={gender}
+                onChange={(e) => { setGender(e.target.value); setPage(1); }}
+                className="w-full px-2.5 py-2 rounded-xl glass-input text-xs text-white"
+              >
+                <option value="" className="bg-slate-900">Semua Gender</option>
+                <option value="Putra" className="bg-slate-900">Putra</option>
+                <option value="Putri" className="bg-slate-900">Putri</option>
+              </select>
+            </div>
 
-          {/* Status Keaktifan */}
-          <div className="md:col-span-3">
-            <select
-              value={statusAktif}
-              onChange={(e) => { setStatusAktif(e.target.value); setPage(1); }}
-              className="w-full px-3 py-2 rounded-xl glass-input text-xs text-white"
-            >
-              <option value="" className="bg-slate-900">Semua Status Aktif</option>
-              <option value="true" className="bg-slate-900">Aktif Saja</option>
-              <option value="false" className="bg-slate-900">Non-Aktif Saja</option>
-            </select>
+            {/* Status Keaktifan */}
+            <div className="col-span-2 sm:col-span-1">
+              <select
+                value={statusAktif}
+                onChange={(e) => { setStatusAktif(e.target.value); setPage(1); }}
+                className="w-full px-2.5 py-2 rounded-xl glass-input text-xs text-white"
+              >
+                <option value="" className="bg-slate-900">Semua Status Aktif</option>
+                <option value="true" className="bg-slate-900">Aktif Saja</option>
+                <option value="false" className="bg-slate-900">Non-Aktif Saja</option>
+              </select>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Main Table */}
+      {/* Data Santri Container (Responsive: Mobile Cards + Desktop Table) */}
       <div className="glass-panel rounded-2xl overflow-hidden border border-white/10">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs">
+        {/* 1. Mobile Cards View (< md) */}
+        <div className="block md:hidden divide-y divide-white/5 p-3 sm:p-4 space-y-3">
+          {loading ? (
+            <div className="py-12 text-center text-slate-400">
+              <Loader2 className="w-6 h-6 animate-spin mx-auto mb-2 text-emerald-400" />
+              Memuat data santri...
+            </div>
+          ) : santriList.length === 0 ? (
+            <div className="py-12 text-center text-slate-400 italic">
+              Tidak ada santri yang ditemukan.
+            </div>
+          ) : (
+            santriList.map((s) => {
+              const bill = s.current_bill;
+              let statusBadgeClass = 'bg-slate-700/60 text-slate-400 border-slate-600/50';
+              let statusText = 'Belum Ditagih';
+
+              if (bill?.status_bayar === 'Lunas') {
+                statusBadgeClass = 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30';
+                statusText = 'Lunas';
+              } else if (bill?.status_bayar === 'Sebagian') {
+                statusBadgeClass = 'bg-amber-500/20 text-amber-300 border-amber-500/30';
+                statusText = 'Sebagian';
+              } else if (bill?.status_bayar === 'Belum Bayar') {
+                statusBadgeClass = 'bg-red-500/20 text-red-300 border-red-500/30';
+                statusText = 'Nunggak';
+              }
+
+              return (
+                <div key={s.id} className="p-3.5 rounded-xl bg-white/[0.03] border border-white/5 space-y-2.5">
+                  {/* Top: NIS & Badges */}
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="font-mono font-medium text-slate-300 text-xs">{s.nis}</span>
+                    <div className="flex items-center gap-1.5 flex-wrap justify-end">
+                      <span className={`px-2 py-0.5 rounded text-[11px] font-semibold whitespace-nowrap ${
+                        s.jenjang === 'SMP' ? 'bg-emerald-500/20 text-emerald-300' : 'bg-teal-500/20 text-teal-300'
+                      }`}>
+                        {s.jenjang} - {s.kelas}
+                      </span>
+                      <span className="text-[11px] px-1.5 py-0.5 rounded bg-white/5 text-slate-300 border border-white/10 whitespace-nowrap">
+                        {s.gender}
+                      </span>
+                      {!s.status_aktif && (
+                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-red-500/20 text-red-400 border border-red-500/30 whitespace-nowrap">
+                          Non-Aktif
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Middle: Nama & Wali */}
+                  <div>
+                    <div className="font-bold text-white text-sm leading-snug">{s.nama_lengkap}</div>
+                    <div className="text-[11px] text-slate-400 mt-0.5 flex flex-wrap items-center gap-x-2">
+                      <span>Wali: <strong className="text-slate-200">{s.nama_wali || '-'}</strong></span>
+                      {s.no_hp && <span>• {s.no_hp}</span>}
+                    </div>
+                  </div>
+
+                  {/* Status Tagihan */}
+                  <div className="pt-2 border-t border-white/5 flex items-center justify-between">
+                    <span className="text-[11px] text-slate-400">Tagihan Bulan Ini:</span>
+                    <div className="text-right">
+                      <span className={`inline-block px-2.5 py-0.5 rounded-full text-[11px] font-bold border whitespace-nowrap ${statusBadgeClass}`}>
+                        {statusText}
+                      </span>
+                      {bill?.sisa_tunggakan > 0 && (
+                        <div className="text-[10px] text-amber-400 mt-0.5 tabular-numbers font-medium">
+                          Sisa: {formatIDR(bill.sisa_tunggakan)}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Action Buttons for Mobile */}
+                  <div className="pt-2 border-t border-white/5 flex items-center justify-between gap-1.5">
+                    <button
+                      onClick={() => onNavigateToPay(s.id)}
+                      className="flex-1 py-1.5 px-2.5 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/30 text-xs font-bold flex items-center justify-center gap-1 transition-all"
+                    >
+                      <CreditCard className="w-3.5 h-3.5" />
+                      <span>Kelola Bayar</span>
+                    </button>
+
+                    <button
+                      onClick={() => onOpenIndividualReport(s.id)}
+                      className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-teal-400 border border-white/10 transition-colors"
+                      title="Cetak Laporan 3-Bulan Perorangan"
+                    >
+                      <FileText className="w-4 h-4" />
+                    </button>
+
+                    {user?.role === 'Admin' && (
+                      <>
+                        <button
+                          onClick={() => onOpenEditSantri(s)}
+                          className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-sky-400 border border-white/10 transition-colors"
+                          title="Edit Data Santri"
+                        >
+                          <Edit3 className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => onOpenDeleteConfirm(s)}
+                          className="p-1.5 rounded-lg bg-white/5 hover:bg-red-500/20 text-red-400 border border-white/10 transition-colors"
+                          title="Hapus Santri"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </>
+                    )}
+                  </div>
+                </div>
+              );
+            })
+          )}
+        </div>
+
+        {/* 2. Desktop Table View (>= md) */}
+        <div className="hidden md:block overflow-x-auto">
+          <table className="w-full text-left text-xs min-w-[720px]">
             <thead>
-              <tr className="bg-white/[0.04] text-slate-300 font-semibold border-b border-white/10">
+              <tr className="bg-white/[0.04] text-slate-300 font-semibold border-b border-white/10 whitespace-nowrap">
                 <th className="py-3 px-4">NIS</th>
                 <th className="py-3 px-4">Nama Lengkap</th>
                 <th className="py-3 px-4 text-center">Unit / Kelas</th>
@@ -207,47 +328,47 @@ export default function SantriView({
 
                   return (
                     <tr key={s.id} className="hover:bg-white/[0.03] transition-colors">
-                      <td className="py-3.5 px-4 font-mono font-medium text-slate-300">
+                      <td className="py-3.5 px-4 font-mono font-medium text-slate-300 whitespace-nowrap">
                         {s.nis}
                       </td>
                       <td className="py-3.5 px-4">
-                        <div className="font-bold text-white text-sm">{s.nama_lengkap}</div>
+                        <div className="font-bold text-white text-sm whitespace-nowrap">{s.nama_lengkap}</div>
                         {!s.status_aktif && (
-                          <span className="text-[10px] px-1.5 py-0.2 rounded bg-red-500/20 text-red-400 border border-red-500/30">
+                          <span className="text-[10px] px-1.5 py-0.2 rounded bg-red-500/20 text-red-400 border border-red-500/30 whitespace-nowrap">
                             Non-Aktif
                           </span>
                         )}
                       </td>
-                      <td className="py-3.5 px-4 text-center">
-                        <span className={`px-2 py-0.5 rounded text-[11px] font-semibold ${
+                      <td className="py-3.5 px-4 text-center whitespace-nowrap">
+                        <span className={`px-2 py-0.5 rounded text-[11px] font-semibold whitespace-nowrap ${
                           s.jenjang === 'SMP' ? 'bg-emerald-500/20 text-emerald-300' : 'bg-teal-500/20 text-teal-300'
                         }`}>
                           {s.jenjang} - {s.kelas}
                         </span>
                       </td>
-                      <td className="py-3.5 px-4 text-center">
+                      <td className="py-3.5 px-4 text-center whitespace-nowrap">
                         <span className="text-slate-300">{s.gender}</span>
                       </td>
                       <td className="py-3.5 px-4 text-slate-300">
-                        <div className="font-medium text-white">{s.nama_wali || '-'}</div>
-                        <div className="text-[11px] text-slate-400">{s.no_hp || '-'}</div>
+                        <div className="font-medium text-white whitespace-nowrap">{s.nama_wali || '-'}</div>
+                        <div className="text-[11px] text-slate-400 whitespace-nowrap">{s.no_hp || '-'}</div>
                       </td>
-                      <td className="py-3.5 px-4 text-center">
-                        <span className={`inline-block px-2.5 py-1 rounded-full text-xs font-bold border ${statusBadgeClass}`}>
+                      <td className="py-3.5 px-4 text-center whitespace-nowrap">
+                        <span className={`inline-block px-2.5 py-1 rounded-full text-xs font-bold border whitespace-nowrap ${statusBadgeClass}`}>
                           {statusText}
                         </span>
                         {bill?.sisa_tunggakan > 0 && (
-                          <div className="text-[10px] text-amber-400 mt-1 tabular-numbers">
+                          <div className="text-[10px] text-amber-400 mt-1 tabular-numbers whitespace-nowrap">
                             Sisa: {formatIDR(bill.sisa_tunggakan)}
                           </div>
                         )}
                       </td>
-                      <td className="py-3.5 px-4">
+                      <td className="py-3.5 px-4 whitespace-nowrap">
                         <div className="flex items-center justify-center gap-1.5">
                           {/* Quick Action Button: Kelola Bayar (jumps to Keuangan) */}
                           <button
                             onClick={() => onNavigateToPay(s.id)}
-                            className="px-2.5 py-1.5 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/30 text-xs font-semibold flex items-center gap-1 transition-all"
+                            className="px-2.5 py-1.5 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/30 text-xs font-semibold flex items-center gap-1 transition-all whitespace-nowrap"
                             title="Kelola & Catat Pembayaran Santri Ini"
                           >
                             <CreditCard className="w-3.5 h-3.5" />

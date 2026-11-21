@@ -72,14 +72,15 @@ Pengelolaan administrasi keuangan pesantren konvensional (syahriah bulanan, uang
 ================================================================================
 ZONA BAWAH: MASTER CONTEXT & LOGIKA SISTEM TERKINI (LIVING CONTEXT)
 ================================================================================
-- Versi Rilis: v1.1.0 (Security Hardened & Zero-External-Asset Mode)
+- Versi Rilis: v1.2.0 (Mobile UI/UX Pro Max Edition)
 - Stack Aktif: Next.js 14 App Router, Supabase PostgreSQL, Tailwind CSS 3.4.
 - RBAC Enforcement: 
   * Login Publik: Hanya menyediakan tombol demo untuk Tamu (Guest / Read-Only).
   * Admin: Akun privat pengurus, full CRUD, tidak bisa diakses publik secara sengaja/tak sengaja.
 - Waktu Baku: Asia/Jakarta (WIB) pada transaksi dan stempel cetak.
 - Asset Storage: Disimpan langsung ke PostgreSQL Supabase (Base64) tanpa Cloudflare R2 (100% Free, No Credit Card).
-- UI/UX & Layout: Collapsible Sidebar dengan floating pill toggle (-right-3.5), mobile drawer, fluid table typography, Plus Jakarta Sans via next/font/google.
+- UI/UX & Layout: Collapsible Sidebar dengan floating pill toggle (-right-3.5), mobile drawer, fluid typography, Plus Jakarta Sans via next/font/google.
 - Riwayat Pembaruan Terkini:
   * [Revisi v1.1]: Eliminasi Cloudflare R2, perbaikan login Tamu (tamu123), perbaikan glitch logo sidebar menciut, dan optimasi 0ms font loading.
+  * [Revisi v1.2]: UI/UX Mobile Pro Max pada Menu Data Santri & Keuangan (Dual-mode Mobile Card List + Desktop Table, 2-column compact filter grid, 50:50 symmetric tab switcher, pencegahan text clipping, dan touch-friendly action buttons).
 
