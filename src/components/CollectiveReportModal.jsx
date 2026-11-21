@@ -117,7 +117,7 @@ export default function CollectiveReportModal({ isOpen, onClose, settings }) {
         </div>
 
         {/* Official Printable Paper Document (A4 format) */}
-        <div className="print-area bg-white text-slate-900 p-8 sm:p-12 rounded-xl shadow-2xl font-sans text-xs leading-normal border border-slate-200">
+        <div className="print-area bg-white text-slate-900 p-6 sm:p-12 rounded-xl shadow-2xl font-sans text-xs leading-normal border border-slate-200 overflow-x-auto">
           {/* Institutional Letterhead (KOP SURAT) */}
           <div className="border-b-4 border-double border-slate-900 pb-4 mb-6">
             {settings?.kop_surat_r2_url ? (
@@ -168,7 +168,7 @@ export default function CollectiveReportModal({ isOpen, onClose, settings }) {
           ) : (
             <>
               <div className="overflow-x-auto my-4">
-                <table className="w-full border-collapse border border-slate-900 text-[11px]">
+                <table className="w-full border-collapse border border-slate-900 text-[11px] min-w-[750px]">
                   <thead>
                     <tr className="bg-slate-100 text-slate-950 font-bold border-b border-slate-900">
                       <th className="border border-slate-900 px-2 py-2 text-center w-8">No</th>

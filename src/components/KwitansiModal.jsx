@@ -1,8 +1,11 @@
-import React from 'react';
-import { Printer, X, CheckCircle2 } from 'lucide-react';
+import React, { useState } from 'react';
+import { Printer, X, CheckCircle2, MessageCircle, Send, PhoneCall } from 'lucide-react';
 import { formatIDR } from './DashboardView';
 
 export default function KwitansiModal({ isOpen, onClose, transaction, settings }) {
+  const [customPhone, setCustomPhone] = useState('');
+  const [showPhonePrompt, setShowPhonePrompt] = useState(false);
+
   if (!isOpen || !transaction) return null;
 
   const dateObj = new Date(transaction.tanggal_waktu || Date.now());
@@ -25,146 +28,291 @@ export default function KwitansiModal({ isOpen, onClose, transaction, settings }
     window.print();
   };
 
+  const formatPhoneNumber = (phone) => {
+    if (!phone) return '';
+    let digits = String(phone).replace(/\D/g, '');
+    if (digits.startsWith('0')) {
+      digits = '62' + digits.slice(1);
+    } else if (digits.startsWith('8')) {
+      digits = '62' + digits;
+    }
+    return digits;
+  };
+
+  const buildWhatsAppMessage = () => {
+    const pesantrenName = settings?.nama_pesantren || 'Pondok Pesantren Al-Farabi';
+    const santriName = transaction.santri?.nama_lengkap || '-';
+    const nis = transaction.santri?.nis || '-';
+    const jenjang = transaction.santri?.jenjang || '-';
+    const kelas = transaction.santri?.kelas || '-';
+    const gender = transaction.santri?.gender || '-';
+    const wali = transaction.santri?.nama_wali || 'Wali Santri';
+    const noKwitansi = transaction.kode_transaksi;
+    const metode = transaction.metode_bayar || 'Cash';
+    const kasir = transaction.admin_input || 'Bendahara';
+
+    return `*BUKTI PEMBAYARAN RESMI (KWITANSI)*
+🏛️ *${pesantrenName.toUpperCase()}*
+-----------------------------------------
+No. Kwitansi : *${noKwitansi}*
+Waktu Bayar  : ${formattedDate} WIB
+Metode Bayar : ${metode}
+Kasir / Admin: ${kasir}
+
+👤 *DATA SANTRI*
+Nama Santri  : *${santriName}*
+NIS          : ${nis}
+Kelas        : ${jenjang} - ${kelas} (${gender})
+Wali Santri  : ${wali}
+Tagihan Bulan: *${billingMonthName} ${transaction.tahun_tagihan}*
+
+💰 *RINCIAN PEMBAYARAN*
+• Syahriah (SPP) : ${formatIDR(transaction.alokasi_syahriah)}
+• Uang Makan     : ${formatIDR(transaction.alokasi_makan)}
+-----------------------------------------
+*TOTAL DIBAYAR*  : *${formatIDR(transaction.nominal_bayar)}*
+Sisa Tunggakan   : ${formatIDR(transaction.sisa_tunggakan)}
+Status Tagihan   : *${(transaction.status_bayar || 'Lunas').toUpperCase()}*
+-----------------------------------------
+_Harap simpan pesan kwitansi ini sebagai bukti pembayaran yang sah. Diterbitkan otomatis oleh sistem informasi keuangan pesantren SIKEJA._`;
+  };
+
+  const handleSendWhatsApp = () => {
+    const defaultPhone = transaction.santri?.no_hp || '';
+    const formatted = formatPhoneNumber(defaultPhone);
+    if (!formatted || formatted === '62') {
+      setShowPhonePrompt(true);
+      return;
+    }
+    const msg = buildWhatsAppMessage();
+    window.open(`https://wa.me/${formatted}?text=${encodeURIComponent(msg)}`, '_blank');
+  };
+
+  const handleConfirmCustomPhone = (e) => {
+    e.preventDefault();
+    const formatted = formatPhoneNumber(customPhone);
+    if (!formatted || formatted.length < 10) {
+      alert('Nomor WhatsApp tidak valid. Masukkan minimal 10 digit angka (contoh: 081234567890).');
+      return;
+    }
+    setShowPhonePrompt(false);
+    const msg = buildWhatsAppMessage();
+    window.open(`https://wa.me/${formatted}?text=${encodeURIComponent(msg)}`, '_blank');
+  };
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-md animate-fade-in overflow-y-auto">
-      {/* Floating Action Bar (Hidden on print) */}
-      <div className="fixed top-4 right-4 z-50 flex items-center gap-3 no-print">
-        <button
-          onClick={handlePrint}
-          className="px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-sm shadow-xl flex items-center gap-2 transition-all hover:scale-105"
-        >
-          <Printer className="w-4 h-4" />
-          <span>Cetak Struk / PDF</span>
-        </button>
-        <button
-          onClick={onClose}
-          className="p-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-colors"
-        >
-          <X className="w-5 h-5" />
-        </button>
-      </div>
+      <div className="w-full max-w-md my-auto flex flex-col items-center">
+        {/* Floating Action Bar (Hidden on print) */}
+        <div className="w-full flex items-center justify-between gap-2 mb-3 no-print">
+          <div className="flex items-center gap-2 flex-wrap">
+            <button
+              onClick={handlePrint}
+              className="px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs flex items-center gap-1.5 transition-all border border-white/15"
+              title="Cetak Kuitansi ke Kertas atau Simpan PDF"
+            >
+              <Printer className="w-4 h-4 text-emerald-400" />
+              <span>Cetak PDF</span>
+            </button>
 
-      {/* Printable Receipt Card (Thermal / A5 Style) */}
-      <div className="print-area w-full max-w-md my-8 p-6 sm:p-8 bg-white text-slate-900 rounded-xl shadow-2xl font-mono text-xs leading-relaxed border border-slate-200">
-        {/* Header Institution */}
-        <div className="text-center pb-4 border-b-2 border-dashed border-slate-300">
-          {settings?.kop_surat_r2_url ? (
-            <img
-              src={settings.kop_surat_r2_url}
-              alt="Kop Pesantren"
-              className="max-h-16 mx-auto mb-2 object-contain"
-            />
-          ) : null}
-          <h2 className="text-base font-bold uppercase tracking-tight text-slate-900 font-sans">
-            {settings?.nama_pesantren || 'Pondok Pesantren Al-Farabi'}
-          </h2>
-          <p className="text-[10px] text-slate-600 font-sans">
-            {settings?.alamat_pesantren || 'Jl. Raya Pesantren No. 1, Kediri'}
-          </p>
-          <div className="mt-2 inline-block px-3 py-1 bg-slate-100 rounded text-[11px] font-bold tracking-widest text-slate-800">
-            BUKTI PEMBAYARAN SANTRI (KWITANSI)
+            <button
+              onClick={handleSendWhatsApp}
+              className="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-lg shadow-emerald-950/50 flex items-center gap-1.5 transition-all hover:scale-105"
+              title="Kirim Struk Otomatis ke WhatsApp Wali Santri"
+            >
+              <MessageCircle className="w-4 h-4" />
+              <span>Kirim ke WA Wali</span>
+            </button>
           </div>
+
+          <button
+            onClick={onClose}
+            className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-colors shrink-0"
+            title="Tutup"
+          >
+            <X className="w-5 h-5" />
+          </button>
         </div>
 
-        {/* Transaction Meta */}
-        <div className="py-3 border-b border-dashed border-slate-300 space-y-1 text-[11px]">
-          <div className="flex justify-between">
-            <span className="text-slate-500">No. Kwitansi:</span>
-            <span className="font-bold text-slate-900">{transaction.kode_transaksi}</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-slate-500">Waktu Bayar:</span>
-            <span className="text-slate-800">{formattedDate} WIB</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-slate-500">Metode Bayar:</span>
-            <span className="font-semibold text-slate-800">{transaction.metode_bayar || 'Cash'}</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-slate-500">Kasir / Admin:</span>
-            <span className="text-slate-800">{transaction.admin_input || 'Admin'}</span>
-          </div>
-        </div>
-
-        {/* Student Details */}
-        <div className="py-3 border-b border-dashed border-slate-300 space-y-1 text-[11px]">
-          <div className="flex justify-between">
-            <span className="text-slate-500">NIS Santri:</span>
-            <span className="font-semibold text-slate-900">{transaction.santri?.nis || '-'}</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-slate-500">Nama Santri:</span>
-            <span className="font-bold text-slate-900 text-right">{transaction.santri?.nama_lengkap || '-'}</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-slate-500">Jenjang / Kelas:</span>
-            <span className="text-slate-800">{transaction.santri?.jenjang} - {transaction.santri?.kelas} ({transaction.santri?.gender})</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-slate-500">Tagihan Bulan:</span>
-            <span className="font-semibold text-slate-900">{billingMonthName} {transaction.tahun_tagihan}</span>
-          </div>
-        </div>
-
-        {/* Breakdown Items */}
-        <div className="py-3 border-b-2 border-dashed border-slate-300 space-y-2 text-[11px]">
-          <div className="flex justify-between">
-            <span>Alokasi Syahriah (SPP):</span>
-            <span className="font-semibold">{formatIDR(transaction.alokasi_syahriah)}</span>
-          </div>
-          <div className="flex justify-between">
-            <span>Alokasi Uang Makan:</span>
-            <span className="font-semibold">{formatIDR(transaction.alokasi_makan)}</span>
-          </div>
-          <div className="pt-2 border-t border-slate-200 flex justify-between font-bold text-xs text-slate-900">
-            <span>TOTAL DIBAYAR:</span>
-            <span className="text-sm">{formatIDR(transaction.nominal_bayar)}</span>
-          </div>
-          <div className="flex justify-between text-[11px] text-slate-600">
-            <span>Sisa Tunggakan:</span>
-            <span className={transaction.sisa_tunggakan > 0 ? 'font-bold text-red-600' : 'text-slate-700'}>
-              {formatIDR(transaction.sisa_tunggakan)}
-            </span>
-          </div>
-          <div className="flex justify-between text-[11px]">
-            <span>Status:</span>
-            <span className={`font-bold uppercase ${transaction.status_bayar === 'Lunas' ? 'text-emerald-700' : 'text-amber-700'}`}>
-              {transaction.status_bayar}
-            </span>
-          </div>
-        </div>
-
-        {/* Signatures / Footer */}
-        <div className="pt-4 flex justify-between items-end text-[10px] text-slate-600 font-sans">
-          <div className="text-center w-28">
-            <p>Penyetor,</p>
-            <div className="h-12 flex items-center justify-center italic text-slate-400">
-              ( Wali Santri )
+        {/* Modal Prompt Input Nomor WA jika Santri Belum Ada No HP */}
+        {showPhonePrompt && (
+          <div className="w-full mb-3 p-4 rounded-xl glass-panel bg-slate-900/95 border border-emerald-500/30 text-white space-y-3 no-print animate-fade-in">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold text-emerald-400 flex items-center gap-1.5">
+                <PhoneCall className="w-3.5 h-3.5" />
+                <span>Masukkan Nomor WhatsApp Wali</span>
+              </span>
+              <button
+                type="button"
+                onClick={() => setShowPhonePrompt(false)}
+                className="text-slate-400 hover:text-white text-xs"
+              >
+                Batal
+              </button>
             </div>
-            <p className="border-t border-slate-300 pt-0.5">{transaction.santri?.nama_wali || 'Wali Santri'}</p>
+            <p className="text-[11px] text-slate-300">
+              Santri ini belum memiliki nomor HP yang tersimpan di sistem. Masukkan nomor WhatsApp wali tujuan:
+            </p>
+            <form onSubmit={handleConfirmCustomPhone} className="flex gap-2">
+              <input
+                type="text"
+                value={customPhone}
+                onChange={(e) => setCustomPhone(e.target.value)}
+                placeholder="Contoh: 081234567890"
+                className="flex-1 px-3 py-1.5 rounded-lg glass-input text-xs text-white"
+                autoFocus
+                required
+              />
+              <button
+                type="submit"
+                className="px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-1"
+              >
+                <Send className="w-3.5 h-3.5" />
+                <span>Kirim</span>
+              </button>
+            </form>
+          </div>
+        )}
+
+        {/* Printable Receipt Card (Thermal / A5 Style) */}
+        <div className="print-area w-full max-h-[85vh] overflow-y-auto p-6 sm:p-8 bg-white text-slate-900 rounded-xl shadow-2xl font-mono text-xs leading-relaxed border border-slate-200">
+          {/* Header Institution */}
+          <div className="text-center pb-4 border-b-2 border-dashed border-slate-300">
+            {settings?.kop_surat_r2_url ? (
+              <img
+                src={settings.kop_surat_r2_url}
+                alt="Kop Pesantren"
+                className="max-h-16 mx-auto mb-2 object-contain"
+              />
+            ) : null}
+            <h2 className="text-base font-bold uppercase tracking-tight text-slate-900 font-sans">
+              {settings?.nama_pesantren || 'Pondok Pesantren Al-Farabi'}
+            </h2>
+            <p className="text-[10px] text-slate-600 font-sans">
+              {settings?.alamat_pesantren || 'Jl. Raya Pesantren No. 1, Kediri'}
+            </p>
+            <div className="mt-2 inline-block px-3 py-1 bg-slate-100 rounded text-[11px] font-bold tracking-widest text-slate-800 font-sans">
+              BUKTI PEMBAYARAN SANTRI (KWITANSI)
+            </div>
           </div>
 
-          <div className="text-center w-36">
-            <p>{settings?.jabatan_pejabat || 'Bendahara Umum'},</p>
-            {settings?.ttd_r2_url ? (
-              <img
-                src={settings.ttd_r2_url}
-                alt="TTD"
-                className="h-10 mx-auto object-contain my-1"
-              />
-            ) : (
-              <div className="h-12 flex items-center justify-center italic text-slate-400">
-                ( Tanda Tangan )
+          {/* Transaction Meta */}
+          <div className="py-3 border-b border-dashed border-slate-300 space-y-1 text-[11px]">
+            <div className="flex justify-between">
+              <span className="text-slate-500">No. Kwitansi:</span>
+              <span className="font-bold text-slate-900">{transaction.kode_transaksi}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-slate-500">Waktu Bayar:</span>
+              <span className="text-slate-800">{formattedDate} WIB</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-slate-500">Metode Bayar:</span>
+              <span className="font-semibold text-slate-800">{transaction.metode_bayar || 'Cash'}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-slate-500">Kasir / Admin:</span>
+              <span className="text-slate-800">{transaction.admin_input || 'Admin'}</span>
+            </div>
+          </div>
+
+          {/* Student Details */}
+          <div className="py-3 border-b border-dashed border-slate-300 space-y-1 text-[11px]">
+            <div className="flex justify-between">
+              <span className="text-slate-500">NIS Santri:</span>
+              <span className="font-semibold text-slate-900">{transaction.santri?.nis || '-'}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-slate-500">Nama Santri:</span>
+              <span className="font-bold text-slate-900 text-right">{transaction.santri?.nama_lengkap || '-'}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-slate-500">Jenjang / Kelas:</span>
+              <span className="text-slate-800">{transaction.santri?.jenjang} - {transaction.santri?.kelas} ({transaction.santri?.gender})</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-slate-500">Tagihan Bulan:</span>
+              <span className="font-semibold text-slate-900">{billingMonthName} {transaction.tahun_tagihan}</span>
+            </div>
+            {transaction.santri?.no_hp && (
+              <div className="flex justify-between text-[10px] text-emerald-700">
+                <span>WhatsApp Wali:</span>
+                <span className="font-semibold">{transaction.santri.no_hp}</span>
               </div>
             )}
-            <p className="border-t border-slate-300 pt-0.5 font-bold text-slate-900">
-              {settings?.nama_pejabat || 'KH. Ahmad Fauzi'}
-            </p>
           </div>
-        </div>
 
-        <div className="mt-5 text-center text-[9px] text-slate-500 border-t border-dashed border-slate-200 pt-2 font-sans">
-          Harap simpan struk kwitansi ini sebagai bukti pembayaran yang sah. Terima kasih.
+          {/* Breakdown Items */}
+          <div className="py-3 border-b-2 border-dashed border-slate-300 space-y-2 text-[11px]">
+            <div className="flex justify-between">
+              <span>Alokasi Syahriah (SPP):</span>
+              <span className="font-semibold">{formatIDR(transaction.alokasi_syahriah)}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>Alokasi Uang Makan:</span>
+              <span className="font-semibold">{formatIDR(transaction.alokasi_makan)}</span>
+            </div>
+            <div className="pt-2 border-t border-slate-200 flex justify-between font-bold text-xs text-slate-900">
+              <span>TOTAL DIBAYAR:</span>
+              <span className="text-sm">{formatIDR(transaction.nominal_bayar)}</span>
+            </div>
+            <div className="flex justify-between text-[11px] text-slate-600">
+              <span>Sisa Tunggakan:</span>
+              <span className={transaction.sisa_tunggakan > 0 ? 'font-bold text-red-600' : 'text-slate-700'}>
+                {formatIDR(transaction.sisa_tunggakan)}
+              </span>
+            </div>
+            <div className="flex justify-between text-[11px]">
+              <span>Status:</span>
+              <span className={`font-bold uppercase ${transaction.status_bayar === 'Lunas' ? 'text-emerald-700' : 'text-amber-700'}`}>
+                {transaction.status_bayar}
+              </span>
+            </div>
+          </div>
+
+          {/* Signatures / Footer */}
+          <div className="pt-4 flex justify-between items-end text-[10px] text-slate-600 font-sans">
+            <div className="text-center w-28">
+              <p>Penyetor,</p>
+              <div className="h-12 flex items-center justify-center italic text-slate-400">
+                ( Wali Santri )
+              </div>
+              <p className="border-t border-slate-300 pt-0.5">{transaction.santri?.nama_wali || 'Wali Santri'}</p>
+            </div>
+
+            <div className="text-center w-36">
+              <p>{settings?.jabatan_pejabat || 'Bendahara Umum'},</p>
+              {settings?.ttd_r2_url ? (
+                <img
+                  src={settings.ttd_r2_url}
+                  alt="TTD"
+                  className="h-10 mx-auto object-contain my-1"
+                />
+              ) : (
+                <div className="h-12 flex items-center justify-center italic text-slate-400">
+                  ( Tanda Tangan )
+                </div>
+              )}
+              <p className="border-t border-slate-300 pt-0.5 font-bold text-slate-900">
+                {settings?.nama_pejabat || 'KH. Ahmad Fauzi'}
+              </p>
+            </div>
+          </div>
+
+          {/* WhatsApp Direct Action Button inside receipt */}
+          <div className="mt-4 pt-3 border-t border-dashed border-slate-200 no-print">
+            <button
+              onClick={handleSendWhatsApp}
+              className="w-full py-2 px-3 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 font-sans font-bold text-xs flex items-center justify-center gap-1.5 transition-colors"
+            >
+              <MessageCircle className="w-4 h-4 text-emerald-600" />
+              <span>Kirim Struk Ini ke WhatsApp Wali</span>
+            </button>
+          </div>
+
+          <div className="mt-4 text-center text-[9px] text-slate-500 border-t border-dashed border-slate-200 pt-2 font-sans">
+            Harap simpan struk kwitansi ini sebagai bukti pembayaran yang sah. Terima kasih.
+          </div>
         </div>
       </div>
     </div>

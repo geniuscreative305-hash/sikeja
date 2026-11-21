@@ -72,7 +72,7 @@ Pengelolaan administrasi keuangan pesantren konvensional (syahriah bulanan, uang
 ================================================================================
 ZONA BAWAH: MASTER CONTEXT & LOGIKA SISTEM TERKINI (LIVING CONTEXT)
 ================================================================================
-- Versi Rilis: v1.2.0 (Mobile UI/UX Pro Max Edition)
+- Versi Rilis: v1.3.0 (Cross-Platform Fluid Viewport & WhatsApp Integration Edition)
 - Stack Aktif: Next.js 14 App Router, Supabase PostgreSQL, Tailwind CSS 3.4.
 - RBAC Enforcement: 
   * Login Publik: Hanya menyediakan tombol demo untuk Tamu (Guest / Read-Only).
@@ -83,4 +83,5 @@ ZONA BAWAH: MASTER CONTEXT & LOGIKA SISTEM TERKINI (LIVING CONTEXT)
 - Riwayat Pembaruan Terkini:
   * [Revisi v1.1]: Eliminasi Cloudflare R2, perbaikan login Tamu (tamu123), perbaikan glitch logo sidebar menciut, dan optimasi 0ms font loading.
   * [Revisi v1.2]: UI/UX Mobile Pro Max pada Menu Data Santri & Keuangan (Dual-mode Mobile Card List + Desktop Table, 2-column compact filter grid, 50:50 symmetric tab switcher, pencegahan text clipping, dan touch-friendly action buttons).
+  * [Revisi v1.3]: Proteksi Anti-Cutoff Lintas-Platform (Global overflow-x guard, dynamic viewport height `min-h-[100dvh]`, flex `min-w-0` shrink auto-adjust) dan Fitur Kirim Struk Kuitansi Otomatis ke WhatsApp Wali Santri (format pesan resmi rapi + auto normalisasi nomor HP + fallback input cepat).
 

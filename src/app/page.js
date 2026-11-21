@@ -250,7 +250,7 @@ export default function AppRoot() {
 
   // Authenticated Application Shell
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0b2239] via-[#0f3d3e] to-[#14533c] text-white flex">
+    <div className="min-h-screen bg-gradient-to-br from-[#0b2239] via-[#0f3d3e] to-[#14533c] text-white flex overflow-x-hidden w-full">
       {/* Sidebar Navigation */}
       <Sidebar
         activeTab={activeTab}
@@ -265,27 +265,27 @@ export default function AppRoot() {
 
       {/* Main Content Area */}
       <div
-        className={`flex-1 flex flex-col min-h-screen transition-all duration-300 ${
+        className={`flex-1 flex flex-col min-h-screen min-w-0 transition-all duration-300 w-full ${
           isCollapsed ? 'lg:pl-20' : 'lg:pl-64'
         }`}
       >
         {/* Top Header Bar */}
-        <header className="sticky top-0 z-30 h-16 border-b border-white/10 backdrop-blur-xl bg-[#0b2239]/80 px-4 sm:px-8 flex items-center justify-between no-print">
-          <div className="flex items-center gap-3">
+        <header className="sticky top-0 z-30 h-16 border-b border-white/10 backdrop-blur-xl bg-[#0b2239]/80 px-3 sm:px-6 lg:px-8 flex items-center justify-between no-print min-w-0">
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
             {/* Mobile Menu Button */}
             <button
               onClick={() => setIsMobileOpen(true)}
-              className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white lg:hidden transition-colors"
+              className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white lg:hidden transition-colors shrink-0"
             >
               <Menu className="w-5 h-5" />
             </button>
 
             {/* Institution Badge */}
-            <div className="flex items-center gap-2">
-              <span className="font-extrabold text-sm sm:text-base text-white tracking-tight truncate max-w-[200px] sm:max-w-xs">
+            <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
+              <span className="font-extrabold text-sm sm:text-base text-white tracking-tight truncate max-w-[140px] sm:max-w-xs md:max-w-md">
                 {settings?.nama_pesantren || 'Pondok Pesantren Al-Farabi'}
               </span>
-              <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${
+              <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border shrink-0 whitespace-nowrap ${
                 user.role === 'Admin'
                   ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30'
                   : 'bg-lime-500/20 text-lime-300 border-lime-500/30'
@@ -295,9 +295,9 @@ export default function AppRoot() {
             </div>
           </div>
 
-          <div className="flex items-center gap-3 sm:gap-4">
+          <div className="flex items-center gap-2 sm:gap-4 shrink-0">
             {/* Active Date Display */}
-            <div className="hidden md:flex items-center gap-1.5 text-xs text-slate-300">
+            <div className="hidden md:flex items-center gap-1.5 text-xs text-slate-300 whitespace-nowrap">
               <Calendar className="w-3.5 h-3.5 text-emerald-400" />
               <span>{todayFormatted}</span>
             </div>
@@ -306,7 +306,7 @@ export default function AppRoot() {
             <button
               onClick={() => setRefreshTrigger((p) => p + 1)}
               disabled={statsLoading}
-              className="p-2 rounded-xl bg-white/[0.06] hover:bg-white/[0.1] border border-white/10 text-slate-300 hover:text-white transition-all"
+              className="p-2 rounded-xl bg-white/[0.06] hover:bg-white/[0.1] border border-white/10 text-slate-300 hover:text-white transition-all shrink-0"
               title="Sinkronisasi Data Mutakhir"
             >
               <RefreshCw className={`w-4 h-4 text-emerald-400 ${statsLoading ? 'animate-spin' : ''}`} />
@@ -315,7 +315,7 @@ export default function AppRoot() {
         </header>
 
         {/* View Content Router */}
-        <main className="flex-1 p-4 sm:p-8 max-w-7xl w-full mx-auto">
+        <main className="flex-1 p-3 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto min-w-0">
           {activeTab === 'dashboard' && (
             <DashboardView
               stats={dashboardStats}

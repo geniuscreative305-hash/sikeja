@@ -469,9 +469,10 @@ export default function KeuanganView({
                       <button
                         onClick={() => onOpenKwitansi(t)}
                         className="px-2.5 py-1.5 rounded-lg bg-white/5 hover:bg-emerald-500/20 text-slate-200 hover:text-emerald-300 border border-white/10 text-xs font-semibold flex items-center gap-1 transition-colors"
+                        title="Lihat Kuitansi & Kirim ke WhatsApp Wali"
                       >
                         <Receipt className="w-3.5 h-3.5 text-emerald-400" />
-                        <span>Struk</span>
+                        <span>Struk & WA</span>
                       </button>
 
                       {user?.role === 'Admin' && t.status_bayar !== 'Lunas' && t.santri_id && (
@@ -602,11 +603,11 @@ export default function KeuanganView({
                             {/* Struk Kwitansi Button */}
                             <button
                               onClick={() => onOpenKwitansi(t)}
-                              className="px-2 py-1 rounded-lg bg-white/5 hover:bg-emerald-500/20 text-slate-300 hover:text-emerald-300 border border-white/10 text-[11px] flex items-center gap-1 transition-colors whitespace-nowrap"
-                              title="Cetak Kuitansi Struk Thermal / A5"
+                              className="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-emerald-500/20 text-slate-300 hover:text-emerald-300 border border-white/10 text-[11px] flex items-center gap-1 transition-colors whitespace-nowrap"
+                              title="Cetak Kuitansi & Kirim ke WhatsApp Wali"
                             >
                               <Receipt className="w-3.5 h-3.5 text-emerald-400" />
-                              <span>Struk</span>
+                              <span>Struk & WA</span>
                             </button>
 
                             {/* Pay button if not full Lunas */}
