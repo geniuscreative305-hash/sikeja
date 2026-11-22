@@ -297,7 +297,7 @@ export default function SantriView({
                     <button
                       onClick={() => onOpenIndividualReport(s.id)}
                       className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-teal-400 border border-white/10 transition-colors"
-                      title="Cetak Laporan 3-Bulan Perorangan"
+                      title="Cetak Laporan Perorangan Santri"
                     >
                       <FileText className="w-4 h-4" />
                     </button>
@@ -447,7 +447,7 @@ export default function SantriView({
                           <button
                             onClick={() => onOpenIndividualReport(s.id)}
                             className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white transition-colors"
-                            title="Cetak Laporan 3-Bulan Perorangan"
+                            title="Cetak Laporan Perorangan Santri"
                           >
                             <FileText className="w-4 h-4 text-teal-400" />
                           </button>

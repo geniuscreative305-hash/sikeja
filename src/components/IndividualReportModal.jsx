@@ -73,11 +73,13 @@ export default function IndividualReportModal({ isOpen, onClose, settings, initi
   const student = report?.santri;
   const transactions = report?.transactions || [];
 
-  // Group by months 1..3 for this quarter
+  // Group by months for this quarter or full year
+  const isYearMode = quarter === 'YEAR' || quarter === 'FULL';
   let quarterMonthIndices = [1, 2, 3];
   if (quarter === 'Q2') quarterMonthIndices = [4, 5, 6];
-  if (quarter === 'Q3') quarterMonthIndices = [7, 8, 9];
-  if (quarter === 'Q4') quarterMonthIndices = [10, 11, 12];
+  else if (quarter === 'Q3') quarterMonthIndices = [7, 8, 9];
+  else if (quarter === 'Q4') quarterMonthIndices = [10, 11, 12];
+  else if (isYearMode) quarterMonthIndices = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
 
   const syahriahTariff = student?.gender === 'Putri'
     ? (settings?.syahriah_putri || 100000)
@@ -120,7 +122,7 @@ export default function IndividualReportModal({ isOpen, onClose, settings, initi
           className="px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-sm shadow-xl flex items-center gap-2 transition-all hover:scale-105"
         >
           <Printer className="w-4 h-4" />
-          <span>Cetak PDF Laporan Perorangan</span>
+          <span>Cetak PDF Laporan {isYearMode ? 'Tahunan' : 'Perorangan'}</span>
         </button>
         <button
           onClick={onClose}
@@ -152,17 +154,18 @@ export default function IndividualReportModal({ isOpen, onClose, settings, initi
 
           <div>
             <label className="block text-[10px] font-semibold text-slate-300 mb-1 uppercase tracking-wider">
-              Kuartal (3 Bulan)
+              Periode Laporan
             </label>
             <select
               value={quarter}
               onChange={(e) => setQuarter(e.target.value)}
               className="px-3 py-1.5 rounded-lg glass-input text-xs text-white"
             >
-              <option value="Q1" className="bg-slate-900">Q1 (Januari - Maret)</option>
-              <option value="Q2" className="bg-slate-900">Q2 (April - Juni)</option>
-              <option value="Q3" className="bg-slate-900">Q3 (Juli - September)</option>
-              <option value="Q4" className="bg-slate-900">Q4 (Oktober - Desember)</option>
+              <option value="Q1" className="bg-slate-900">Kuartal 1 (Januari - Maret)</option>
+              <option value="Q2" className="bg-slate-900">Kuartal 2 (April - Juni)</option>
+              <option value="Q3" className="bg-slate-900">Kuartal 3 (Juli - September)</option>
+              <option value="Q4" className="bg-slate-900">Kuartal 4 (Oktober - Desember)</option>
+              <option value="YEAR" className="bg-slate-900 font-bold text-emerald-400">1 Tahun Penuh (Januari - Desember)</option>
             </select>
           </div>
 
@@ -209,10 +212,16 @@ export default function IndividualReportModal({ isOpen, onClose, settings, initi
           {/* Title */}
           <div className="text-center my-4">
             <h2 className="text-sm font-extrabold uppercase tracking-wide underline underline-offset-4 text-slate-950">
-              LEMBAR LAPORAN KEUANGAN & TUNGGAKAN PERORANGAN (3 BULAN)
+              {isYearMode
+                ? 'LEMBAR LAPORAN KEUANGAN & TUNGGAKAN PERORANGAN (1 TAHUN PENUH)'
+                : 'LEMBAR LAPORAN KEUANGAN & TUNGGAKAN PERORANGAN (3 BULAN)'}
             </h2>
             <p className="text-xs text-slate-700 mt-1">
-              Periode Kuartal: <strong>{quarter} Tahun {year}</strong>
+              {isYearMode ? (
+                <>Periode: <strong>Tahun {year} (Januari - Desember)</strong></>
+              ) : (
+                <>Periode Kuartal: <strong>{quarter} Tahun {year}</strong></>
+              )}
             </p>
           </div>
 
@@ -253,44 +262,44 @@ export default function IndividualReportModal({ isOpen, onClose, settings, initi
                 </div>
               </div>
 
-              {/* 3-Month Breakdown Table */}
-              <div className="overflow-x-auto my-5">
-                <table className="w-full border-collapse border border-slate-900 text-[11px] min-w-[650px]">
+              {/* Breakdown Table */}
+              <div className="overflow-x-auto my-4">
+                <table className={`w-full border-collapse border border-slate-900 ${isYearMode ? 'text-[10px]' : 'text-[11px]'} min-w-[650px]`}>
                   <thead>
                     <tr className="bg-slate-100 text-slate-950 font-bold border-b border-slate-900">
-                      <th className="border border-slate-900 px-3 py-2 text-left">Bulan Tagihan</th>
-                      <th className="border border-slate-900 px-3 py-2 text-right">Syahriah (SPP)</th>
-                      <th className="border border-slate-900 px-3 py-2 text-right">Uang Makan</th>
-                      <th className="border border-slate-900 px-3 py-2 text-right">Total Tagihan</th>
-                      <th className="border border-slate-900 px-3 py-2 text-right">Telah Dibayar</th>
-                      <th className="border border-slate-900 px-3 py-2 text-right">Sisa Tunggakan</th>
-                      <th className="border border-slate-900 px-3 py-2 text-center">Status</th>
+                      <th className={`border border-slate-900 px-3 ${isYearMode ? 'py-1.5' : 'py-2'} text-left`}>Bulan Tagihan</th>
+                      <th className={`border border-slate-900 px-3 ${isYearMode ? 'py-1.5' : 'py-2'} text-right`}>Syahriah (SPP)</th>
+                      <th className={`border border-slate-900 px-3 ${isYearMode ? 'py-1.5' : 'py-2'} text-right`}>Uang Makan</th>
+                      <th className={`border border-slate-900 px-3 ${isYearMode ? 'py-1.5' : 'py-2'} text-right`}>Total Tagihan</th>
+                      <th className={`border border-slate-900 px-3 ${isYearMode ? 'py-1.5' : 'py-2'} text-right`}>Telah Dibayar</th>
+                      <th className={`border border-slate-900 px-3 ${isYearMode ? 'py-1.5' : 'py-2'} text-right`}>Sisa Tunggakan</th>
+                      <th className={`border border-slate-900 px-3 ${isYearMode ? 'py-1.5' : 'py-2'} text-center`}>Status</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-300">
                     {quarterRows.map((row, idx) => (
                       <tr key={idx} className="tabular-numbers">
-                        <td className="border border-slate-400 px-3 py-2 font-bold text-slate-950">
+                        <td className={`border border-slate-400 px-3 ${isYearMode ? 'py-1' : 'py-2'} font-bold text-slate-950`}>
                           {row.monthName} {year}
                         </td>
-                        <td className="border border-slate-400 px-3 py-2 text-right">
+                        <td className={`border border-slate-400 px-3 ${isYearMode ? 'py-1' : 'py-2'} text-right`}>
                           <div>{formatIDR(syahriahTariff)}</div>
-                          <div className="text-[10px] text-slate-500">Bayar: {formatIDR(row.alokasiSyahriah)}</div>
+                          <div className={`${isYearMode ? 'text-[9px]' : 'text-[10px]'} text-slate-500`}>Bayar: {formatIDR(row.alokasiSyahriah)}</div>
                         </td>
-                        <td className="border border-slate-400 px-3 py-2 text-right">
+                        <td className={`border border-slate-400 px-3 ${isYearMode ? 'py-1' : 'py-2'} text-right`}>
                           <div>{formatIDR(makanTariff)}</div>
-                          <div className="text-[10px] text-slate-500">Bayar: {formatIDR(row.alokasiMakan)}</div>
+                          <div className={`${isYearMode ? 'text-[9px]' : 'text-[10px]'} text-slate-500`}>Bayar: {formatIDR(row.alokasiMakan)}</div>
                         </td>
-                        <td className="border border-slate-400 px-3 py-2 text-right font-medium">
+                        <td className={`border border-slate-400 px-3 ${isYearMode ? 'py-1' : 'py-2'} text-right font-medium`}>
                           {formatIDR(row.nominalTagihan)}
                         </td>
-                        <td className="border border-slate-400 px-3 py-2 text-right font-bold text-emerald-800">
+                        <td className={`border border-slate-400 px-3 ${isYearMode ? 'py-1' : 'py-2'} text-right font-bold text-emerald-800`}>
                           {formatIDR(row.nominalBayar)}
                         </td>
-                        <td className="border border-slate-400 px-3 py-2 text-right font-bold text-red-700">
+                        <td className={`border border-slate-400 px-3 ${isYearMode ? 'py-1' : 'py-2'} text-right font-bold text-red-700`}>
                           {formatIDR(row.sisaTunggakan)}
                         </td>
-                        <td className="border border-slate-400 px-3 py-2 text-center font-bold uppercase text-[10px]">
+                        <td className={`border border-slate-400 px-3 ${isYearMode ? 'py-1 text-[9px]' : 'py-2 text-[10px]'} text-center font-bold uppercase`}>
                           {row.status}
                         </td>
                       </tr>
@@ -298,20 +307,20 @@ export default function IndividualReportModal({ isOpen, onClose, settings, initi
                   </tbody>
                   <tfoot>
                     <tr className="bg-slate-100 font-extrabold text-slate-950 border-t-2 border-slate-900 tabular-numbers">
-                      <td colSpan={3} className="border border-slate-900 px-3 py-2 text-right">
-                        TOTAL KUARTAL {quarter}
+                      <td colSpan={3} className={`border border-slate-900 px-3 ${isYearMode ? 'py-1.5' : 'py-2'} text-right`}>
+                        {isYearMode ? `TOTAL TAHUNAN ${year}` : `TOTAL KUARTAL ${quarter}`}
                       </td>
-                      <td className="border border-slate-900 px-3 py-2 text-right">
+                      <td className={`border border-slate-900 px-3 ${isYearMode ? 'py-1.5' : 'py-2'} text-right`}>
                         {formatIDR(totalTagihan)}
                       </td>
-                      <td className="border border-slate-900 px-3 py-2 text-right text-emerald-800">
+                      <td className={`border border-slate-900 px-3 ${isYearMode ? 'py-1.5' : 'py-2'} text-right text-emerald-800`}>
                         {formatIDR(totalBayar)}
                       </td>
-                      <td className="border border-slate-900 px-3 py-2 text-right text-red-800">
+                      <td className={`border border-slate-900 px-3 ${isYearMode ? 'py-1.5' : 'py-2'} text-right text-red-800`}>
                         {formatIDR(totalTunggakan)}
                       </td>
-                      <td className="border border-slate-900 text-center text-[10px]">
-                        {totalTunggakan === 0 ? 'LUNAS KUARTAL' : 'BELUM LUNAS'}
+                      <td className={`border border-slate-900 text-center ${isYearMode ? 'text-[9px]' : 'text-[10px]'}`}>
+                        {totalTunggakan === 0 ? (isYearMode ? 'LUNAS 1 TAHUN' : 'LUNAS KUARTAL') : 'BELUM LUNAS'}
                       </td>
                     </tr>
                   </tfoot>
@@ -323,7 +332,7 @@ export default function IndividualReportModal({ isOpen, onClose, settings, initi
                 <span className="font-bold text-slate-900">Catatan Keuangan: </span>
                 {totalTunggakan === 0 ? (
                   <span className="text-emerald-800 font-medium">
-                    Alhamdulillah, seluruh kewajiban administrasi syahriah dan uang makan santri pada periode Kuartal {quarter} ({quarterRows.map(r => r.monthName).join(', ')}) telah TERLUNASI.
+                    Alhamdulillah, seluruh kewajiban administrasi syahriah dan uang makan santri pada periode {isYearMode ? `Tahun ${year} (12 Bulan)` : `Kuartal ${quarter} (${quarterRows.map(r => r.monthName).join(', ')})`} telah TERLUNASI.
                   </span>
                 ) : (
                   <span className="text-red-800 font-medium">

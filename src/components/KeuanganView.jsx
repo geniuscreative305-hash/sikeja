@@ -198,10 +198,10 @@ export default function KeuanganView({
           <button
             onClick={() => onOpenIndividualReport()}
             className="px-3 py-2 rounded-xl bg-white/[0.06] hover:bg-white/[0.1] border border-white/10 text-xs font-semibold text-slate-200 hover:text-white transition-all flex items-center gap-1.5 whitespace-nowrap"
-            title="Cetak Laporan 3-Bulan Perorangan"
+            title="Cetak Laporan Perorangan Santri (Kuartal / 1 Tahun Penuh)"
           >
             <FileText className="w-3.5 h-3.5 text-emerald-400" />
-            <span>Laporan 3-Bulan</span>
+            <span>Laporan Santri</span>
           </button>
 
           {/* Admin Operations */}

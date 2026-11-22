@@ -536,6 +536,7 @@ export async function GET(request) {
       if (quarter === 'Q2') months = [4, 5, 6];
       else if (quarter === 'Q3') months = [7, 8, 9];
       else if (quarter === 'Q4') months = [10, 11, 12];
+      else if (quarter === 'YEAR' || quarter === 'FULL') months = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
 
       const { data: transactions } = await supabaseAdmin
         .from('transaksi')

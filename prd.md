@@ -72,7 +72,7 @@ Pengelolaan administrasi keuangan pesantren konvensional (syahriah bulanan, uang
 ================================================================================
 ZONA BAWAH: MASTER CONTEXT & LOGIKA SISTEM TERKINI (LIVING CONTEXT)
 ================================================================================
-- Versi Rilis: v2.1.0 (Academic Continuity, Advanced Reporting & Official Parigi Identity Edition)
+- Versi Rilis: v2.2.0 (Individual Annual Report & Multi-Period Reporting Edition)
 - Stack Aktif: Next.js 14 App Router, Supabase PostgreSQL, Tailwind CSS 3.4, SheetJS (xlsx).
 - RBAC Enforcement: 
   * Login Publik: Hanya menyediakan tombol demo untuk Tamu (Guest / Read-Only).
@@ -87,4 +87,5 @@ ZONA BAWAH: MASTER CONTEXT & LOGIKA SISTEM TERKINI (LIVING CONTEXT)
   * [Revisi v1.3]: Proteksi Anti-Cutoff Lintas-Platform (Global overflow-x guard, dynamic viewport height `min-h-[100dvh]`, flex `min-w-0` shrink auto-adjust) dan Fitur Kirim Struk Kuitansi Otomatis ke WhatsApp Wali Santri (format pesan resmi rapi + auto normalisasi nomor HP + fallback input cepat).
   * [Revisi v2.0]: 6 Fitur Utama: Jenjang Mahasiswa, Filter Komprehensif Laporan Cetak PDF & CSV (Gender, Kelas, Jenjang, Status), Import Data Santri Excel (.xlsx) dengan Template Resmi & Validasi, Fix Akumulasi Pelunasan Tagihan Sebagian -> Lunas, Kenaikan Kelas & Arsip Riwayat Akademik (JSONB), serta Status Santri 3-State (Aktif, Nonaktif, Lulus).
   * [Revisi v2.1]: Koreksi Lokasi Cetak TTD Laporan PDF (Kediri -> Parigi) dan pemutakhiran alamat resmi fallback pesantren.
+  * [Revisi v2.2]: Penambahan Fitur Cetak Laporan Tahunan Khusus Per Santri (12 Bulan / 1 Tahun Penuh) dengan filter terpadu (Kuartal Q1-Q4 vs 1 Tahun Penuh), rekapitulasi totalan 1 tahun, dan format A4 proporsional.
 
