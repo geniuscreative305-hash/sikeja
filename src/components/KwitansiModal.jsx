@@ -189,7 +189,7 @@ _Harap simpan pesan kwitansi ini sebagai bukti pembayaran yang sah. Diterbitkan 
               {settings?.nama_pesantren || 'Pondok Pesantren Al-Farabi'}
             </h2>
             <p className="text-[10px] text-slate-600 font-sans">
-              {settings?.alamat_pesantren || 'Jl. Raya Pesantren No. 1, Kediri'}
+              {settings?.alamat_pesantren || 'Jln. Cigugur KM 03 Pasirkiara Karangbenda Kec. Parigi Kab. Pangandaran Prov. Jawa Barat 46393'}
             </p>
             <div className="mt-2 inline-block px-3 py-1 bg-slate-100 rounded text-[11px] font-bold tracking-widest text-slate-800 font-sans">
               BUKTI PEMBAYARAN SANTRI (KWITANSI)

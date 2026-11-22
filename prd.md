@@ -72,16 +72,19 @@ Pengelolaan administrasi keuangan pesantren konvensional (syahriah bulanan, uang
 ================================================================================
 ZONA BAWAH: MASTER CONTEXT & LOGIKA SISTEM TERKINI (LIVING CONTEXT)
 ================================================================================
-- Versi Rilis: v1.3.0 (Cross-Platform Fluid Viewport & WhatsApp Integration Edition)
-- Stack Aktif: Next.js 14 App Router, Supabase PostgreSQL, Tailwind CSS 3.4.
+- Versi Rilis: v2.1.0 (Academic Continuity, Advanced Reporting & Official Parigi Identity Edition)
+- Stack Aktif: Next.js 14 App Router, Supabase PostgreSQL, Tailwind CSS 3.4, SheetJS (xlsx).
 - RBAC Enforcement: 
   * Login Publik: Hanya menyediakan tombol demo untuk Tamu (Guest / Read-Only).
   * Admin: Akun privat pengurus, full CRUD, tidak bisa diakses publik secara sengaja/tak sengaja.
 - Waktu Baku: Asia/Jakarta (WIB) pada transaksi dan stempel cetak.
+- Alamat & Identitas Resmi: Jln. Cigugur KM 03 Pasirkiara Karangbenda Kec. Parigi Kab. Pangandaran Prov. Jawa Barat 46393 (Lokasi TTD: Parigi).
 - Asset Storage: Disimpan langsung ke PostgreSQL Supabase (Base64) tanpa Cloudflare R2 (100% Free, No Credit Card).
 - UI/UX & Layout: Collapsible Sidebar dengan floating pill toggle (-right-3.5), mobile drawer, fluid typography, Plus Jakarta Sans via next/font/google.
 - Riwayat Pembaruan Terkini:
   * [Revisi v1.1]: Eliminasi Cloudflare R2, perbaikan login Tamu (tamu123), perbaikan glitch logo sidebar menciut, dan optimasi 0ms font loading.
   * [Revisi v1.2]: UI/UX Mobile Pro Max pada Menu Data Santri & Keuangan (Dual-mode Mobile Card List + Desktop Table, 2-column compact filter grid, 50:50 symmetric tab switcher, pencegahan text clipping, dan touch-friendly action buttons).
   * [Revisi v1.3]: Proteksi Anti-Cutoff Lintas-Platform (Global overflow-x guard, dynamic viewport height `min-h-[100dvh]`, flex `min-w-0` shrink auto-adjust) dan Fitur Kirim Struk Kuitansi Otomatis ke WhatsApp Wali Santri (format pesan resmi rapi + auto normalisasi nomor HP + fallback input cepat).
+  * [Revisi v2.0]: 6 Fitur Utama: Jenjang Mahasiswa, Filter Komprehensif Laporan Cetak PDF & CSV (Gender, Kelas, Jenjang, Status), Import Data Santri Excel (.xlsx) dengan Template Resmi & Validasi, Fix Akumulasi Pelunasan Tagihan Sebagian -> Lunas, Kenaikan Kelas & Arsip Riwayat Akademik (JSONB), serta Status Santri 3-State (Aktif, Nonaktif, Lulus).
+  * [Revisi v2.1]: Koreksi Lokasi Cetak TTD Laporan PDF (Kediri -> Parigi) dan pemutakhiran alamat resmi fallback pesantren.
 

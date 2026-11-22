@@ -159,7 +159,7 @@ export default function CollectiveReportModal({ isOpen, onClose, settings }) {
                   {settings?.nama_pesantren || 'PONDOK PESANTREN AL-FARABI'}
                 </h1>
                 <p className="text-xs text-slate-700 max-w-xl mx-auto">
-                  {settings?.alamat_pesantren || 'Jl. Raya Pesantren No. 1, Kediri, Jawa Timur'}
+                  {settings?.alamat_pesantren || 'Jln. Cigugur KM 03 Pasirkiara Karangbenda Kec. Parigi Kab. Pangandaran Prov. Jawa Barat 46393'}
                 </p>
                 <p className="text-[11px] text-slate-600 font-medium">
                   Unit Pendidikan: Sekolah Menengah Pertama (SMP) & Madrasah Aliyah (MA)
@@ -251,7 +251,7 @@ export default function CollectiveReportModal({ isOpen, onClose, settings }) {
                 </div>
 
                 <div className="text-center w-60">
-                  <p>Kediri, {new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
+                  <p>Parigi, {new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
                   <p className="font-semibold">{settings?.jabatan_pejabat || 'Bendahara Umum'},</p>
                   <div className="my-2 h-20 flex items-center justify-center">
                     {settings?.ttd_r2_url ? (
