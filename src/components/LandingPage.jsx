@@ -31,7 +31,7 @@ const formatRupiah = (num) => {
 };
 
 // Animated Number Component (Counts up smoothly from 0 to target)
-function AnimatedNumber({ value, duration = 1200 }) {
+function AnimatedNumber({ value, duration = 900 }) {
   const [displayValue, setDisplayValue] = useState(0);
   const targetVal = Number(value) || 0;
   const currentValRef = useRef(0);
@@ -51,7 +51,7 @@ function AnimatedNumber({ value, duration = 1200 }) {
       const elapsed = timestamp - startTimestamp;
       const progress = Math.min(elapsed / duration, 1);
       
-      // Cubic ease-out curve
+      // Fast & snappy cubic ease-out curve
       const easeOut = 1 - Math.pow(1 - progress, 3);
       const current = Math.round(startVal + diff * easeOut);
       
@@ -96,9 +96,9 @@ export default function LandingPage({ onOpenLogin, onBrowseStats }) {
     }
   });
 
-  // Typing effect state
+  // Typing effect state - Starts typing immediately on first render without 2s freeze
   const [phraseIndex, setPhraseIndex] = useState(0);
-  const [currentText, setCurrentText] = useState(TYPING_PHRASES[0]);
+  const [currentText, setCurrentText] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
 
   // Smooth scroll handler
@@ -118,24 +118,24 @@ export default function LandingPage({ onOpenLogin, onBrowseStats }) {
       if (currentText.length < currentPhrase.length) {
         timer = setTimeout(() => {
           setCurrentText(currentPhrase.slice(0, currentText.length + 1));
-        }, 75);
+        }, 60);
       } else {
         // Pause at full text before deleting
         timer = setTimeout(() => {
           setIsDeleting(true);
-        }, 2200);
+        }, 1500);
       }
     } else {
       if (currentText.length > 0) {
         timer = setTimeout(() => {
           setCurrentText(currentPhrase.slice(0, currentText.length - 1));
-        }, 35);
+        }, 30);
       } else {
         // Pause briefly after deleting before starting next phrase
         timer = setTimeout(() => {
           setIsDeleting(false);
           setPhraseIndex((prev) => (prev + 1) % TYPING_PHRASES.length);
-        }, 350);
+        }, 200);
       }
     }
 

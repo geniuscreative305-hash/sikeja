@@ -88,11 +88,15 @@ async function getSettingsMap() {
     ttd_r2_url: '',
     nama_pejabat: 'KH. Ahmad Fauzi',
     jabatan_pejabat: 'Bendahara Umum',
+    diskon_libur_bulan: '[]',
+    diskon_libur_makan_persen: 100,
+    diskon_libur_syahriah_persen: 0,
+    beasiswa_santri_config: '{}',
   };
 
   if (!error && data) {
     data.forEach((item) => {
-      if (['syahriah_putra', 'syahriah_putri', 'uang_makan'].includes(item.key)) {
+      if (['syahriah_putra', 'syahriah_putri', 'uang_makan', 'diskon_libur_makan_persen', 'diskon_libur_syahriah_persen'].includes(item.key)) {
         settings[item.key] = parseFloat(item.value) || 0;
       } else {
         settings[item.key] = item.value || '';
@@ -181,11 +185,11 @@ export async function GET(request) {
       const [pemasukanRes, pengeluaranRes, currentMonthBillsRes, trendDataRes] = await Promise.all([
         supabaseAdmin
           .from('transaksi')
-          .select('nominal_bayar')
+          .select('nominal_bayar, santri(gender)')
           .eq('jenis_transaksi', 'Pemasukan'),
         supabaseAdmin
           .from('transaksi')
-          .select('nominal_bayar')
+          .select('nominal_bayar, keterangan')
           .eq('jenis_transaksi', 'Pengeluaran'),
         supabaseAdmin
           .from('transaksi')
@@ -214,6 +218,31 @@ export async function GET(request) {
       );
 
       const saldoKas = totalPemasukan - totalPengeluaran;
+
+      // Gender Arus Kas Breakdown (Putra vs Putri)
+      let pemasukanPutra = 0;
+      let pemasukanPutri = 0;
+      (pemasukanData || []).forEach((row) => {
+        const amount = parseFloat(row.nominal_bayar) || 0;
+        const gdr = row.santri?.gender;
+        if (gdr === 'Putra') pemasukanPutra += amount;
+        else if (gdr === 'Putri') pemasukanPutri += amount;
+      });
+
+      let pengeluaranPutra = 0;
+      let pengeluaranPutri = 0;
+      let pengeluaranUmum = 0;
+      (pengeluaranData || []).forEach((row) => {
+        const amount = parseFloat(row.nominal_bayar) || 0;
+        const ket = (row.keterangan || '').toLowerCase();
+        if (ket.includes('[putra]')) {
+          pengeluaranPutra += amount;
+        } else if (ket.includes('[putri]')) {
+          pengeluaranPutri += amount;
+        } else {
+          pengeluaranUmum += amount;
+        }
+      });
 
       let totalCurrentBills = currentMonthBills?.length || 0;
       let lunasCount = 0;
@@ -303,6 +332,15 @@ export async function GET(request) {
           percentage: mahasiswaRatio,
         },
         quarterly_trend: monthsTrend,
+        gender_flow: {
+          pemasukan_putra: pemasukanPutra,
+          pemasukan_putri: pemasukanPutri,
+          pengeluaran_putra: pengeluaranPutra,
+          pengeluaran_putri: pengeluaranPutri,
+          pengeluaran_umum: pengeluaranUmum,
+          net_putra: pemasukanPutra - pengeluaranPutra,
+          net_putri: pemasukanPutri - pengeluaranPutri,
+        },
       });
     }
 
@@ -499,8 +537,23 @@ export async function GET(request) {
         });
       }
 
+      const settings = await getSettingsMap();
+      let beasiswaConfig = {};
+      try {
+        beasiswaConfig = JSON.parse(settings.beasiswa_santri_config || '{}');
+      } catch (e) {
+        beasiswaConfig = {};
+      }
+
       const enhancedSantri = (santriList || []).map((s) => ({
         ...s,
+        beasiswa: beasiswaConfig[s.id] || {
+          jenis: 'Reguler',
+          tipe: 'Tidak Ada',
+          bebas_syahriah: false,
+          bebas_makan: false,
+          nominal_potongan: 0,
+        },
         current_bill: billStatusMap[s.id] || {
           status_bayar: 'Belum Ditagih',
           nominal_tagihan: 0,
@@ -844,6 +897,29 @@ export async function POST(request) {
       const syahriahPutri = settings.syahriah_putri;
       const uangMakan = settings.uang_makan;
 
+      // 1. Check Diskon Libur for month b
+      let holidayMonths = [];
+      try {
+        holidayMonths = JSON.parse(settings.diskon_libur_bulan || '[]');
+      } catch (e) {
+        holidayMonths = [];
+      }
+      const isHoliday = Array.isArray(holidayMonths) && holidayMonths.includes(b);
+      const makanDiscountPercent = isHoliday ? (parseFloat(settings.diskon_libur_makan_persen) || 100) : 0;
+      const syahriahDiscountPercent = isHoliday ? (parseFloat(settings.diskon_libur_syahriah_persen) || 0) : 0;
+
+      const effectiveMakan = Math.max(0, Math.round(uangMakan * (1 - makanDiscountPercent / 100)));
+      const effectiveSyahriahPutra = Math.max(0, Math.round(syahriahPutra * (1 - syahriahDiscountPercent / 100)));
+      const effectiveSyahriahPutri = Math.max(0, Math.round(syahriahPutri * (1 - syahriahDiscountPercent / 100)));
+
+      // 2. Load Beasiswa Config
+      let beasiswaMap = {};
+      try {
+        beasiswaMap = JSON.parse(settings.beasiswa_santri_config || '{}');
+      } catch (e) {
+        beasiswaMap = {};
+      }
+
       const now = new Date();
       const yearStr = now.getFullYear();
       const monthStr = String(now.getMonth() + 1).padStart(2, '0');
@@ -874,8 +950,38 @@ export async function POST(request) {
 
       const newBills = studentsToBill.map((student) => {
         const code = `${datePrefix}-${String(seq++).padStart(4, '0')}`;
-        const syahriahTariff = student.gender === 'Putri' ? syahriahPutri : syahriahPutra;
-        const nominalTagihan = syahriahTariff + uangMakan;
+        const sc = beasiswaMap[student.id];
+
+        let nominalTagihan = 0;
+        let nominalBayar = 0;
+        let statusBayar = 'Belum Bayar';
+        let keterangan = `Tagihan Syahriah & Uang Makan ${monthLabel} ${y}`;
+
+        if (sc && sc.jenis && sc.jenis !== 'Reguler') {
+          if (sc.tipe === 'Full') {
+            nominalTagihan = 0;
+            nominalBayar = 0;
+            statusBayar = 'Lunas';
+            keterangan = `Lunas Beasiswa (100% Bebas Biaya - ${sc.jenis}) ${monthLabel} ${y}`;
+          } else {
+            // Sebagian
+            let sTariff = student.gender === 'Putri' ? effectiveSyahriahPutri : effectiveSyahriahPutra;
+            let mTariff = effectiveMakan;
+            if (sc.bebas_syahriah) sTariff = 0;
+            if (sc.bebas_makan) mTariff = 0;
+            const potongan = parseFloat(sc.nominal_potongan) || 0;
+            nominalTagihan = Math.max(0, sTariff + mTariff - potongan);
+            statusBayar = nominalTagihan === 0 ? 'Lunas' : 'Belum Bayar';
+            keterangan = `Tagihan ${monthLabel} ${y} (Beasiswa Sebagian - ${sc.jenis})`;
+          }
+        } else {
+          // Santri Reguler
+          const sTariff = student.gender === 'Putri' ? effectiveSyahriahPutri : effectiveSyahriahPutra;
+          nominalTagihan = sTariff + effectiveMakan;
+          if (isHoliday) {
+            keterangan = `Tagihan ${monthLabel} ${y} (Diskon Libur Pondok)`;
+          }
+        }
 
         return {
           kode_transaksi: code,
@@ -884,13 +990,13 @@ export async function POST(request) {
           bulan_tagihan: b,
           tahun_tagihan: y,
           nominal_tagihan: nominalTagihan,
-          nominal_bayar: 0,
+          nominal_bayar: nominalBayar,
           alokasi_syahriah: 0,
           alokasi_makan: 0,
           sisa_tunggakan: nominalTagihan,
-          status_bayar: 'Belum Bayar',
+          status_bayar: statusBayar,
           metode_bayar: '-',
-          keterangan: `Tagihan Syahriah & Uang Makan ${monthLabel} ${y}`,
+          keterangan: keterangan,
           admin_input: user.nama_tampilan || 'Admin',
         };
       });
@@ -1098,6 +1204,29 @@ export async function POST(request) {
           .single();
         if (error) return NextResponse.json({ error: error.message }, { status: 500 });
         result = data;
+      }
+
+      // Handle Beasiswa configuration if provided
+      if (body.beasiswa && result?.id) {
+        try {
+          const settings = await getSettingsMap();
+          let beasiswaMap = {};
+          try {
+            beasiswaMap = JSON.parse(settings.beasiswa_santri_config || '{}');
+          } catch (e) {
+            beasiswaMap = {};
+          }
+          if (body.beasiswa.jenis === 'Reguler') {
+            delete beasiswaMap[result.id];
+          } else {
+            beasiswaMap[result.id] = body.beasiswa;
+          }
+          await supabaseAdmin
+            .from('setting')
+            .upsert({ key: 'beasiswa_santri_config', value: JSON.stringify(beasiswaMap) }, { onConflict: 'key' });
+        } catch (e) {
+          console.error('Failed to save beasiswa config:', e);
+        }
       }
 
       return NextResponse.json({

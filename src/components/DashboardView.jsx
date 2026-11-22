@@ -171,6 +171,94 @@ export default function DashboardView({
         </div>
       </div>
 
+      {/* Widget: Arus Kas Santri Putra & Putri */}
+      <div className="glass-panel rounded-2xl p-6 space-y-5">
+        <div className="flex items-center justify-between pb-3 border-b border-white/10">
+          <div className="flex items-center gap-2.5">
+            <div className="p-2 rounded-xl bg-lime-500/20 text-lime-300 border border-lime-500/30">
+              <Scale className="w-5 h-5" />
+            </div>
+            <div>
+              <h3 className="font-bold text-white text-base">Arus Kas Santri Putra & Santri Putri</h3>
+              <p className="text-xs text-slate-400">Rincian komparasi pemasukan dan pengeluaran operasional per gender</p>
+            </div>
+          </div>
+          <span className="text-xs text-slate-400 font-medium hidden sm:inline-block">
+            Terfilter otomatis dari data transaksi & pos peruntukan
+          </span>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Card Putra */}
+          <div className="p-4 sm:p-5 rounded-xl bg-white/[0.04] border border-blue-500/30 space-y-4 hover:border-blue-500/50 transition-colors">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="w-3 h-3 rounded-full bg-blue-400 shadow-[0_0_8px_rgba(96,165,250,0.8)]"></span>
+                <span className="text-sm font-bold text-blue-200">Santri Putra</span>
+              </div>
+              <span className="text-xs px-2.5 py-0.5 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/30 font-semibold">
+                Net: {formatIDR(stats?.gender_flow?.net_putra || 0)}
+              </span>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3 pt-1">
+              <div className="p-3 rounded-lg bg-black/20 border border-white/5">
+                <span className="text-[11px] text-slate-400 mb-1 flex items-center gap-1">
+                  <ArrowUpRight className="w-3 h-3 text-emerald-400" />
+                  <span>Total Pemasukan</span>
+                </span>
+                <span className="text-sm sm:text-base font-extrabold text-emerald-400 tabular-numbers">
+                  {formatIDR(stats?.gender_flow?.pemasukan_putra || 0)}
+                </span>
+              </div>
+              <div className="p-3 rounded-lg bg-black/20 border border-white/5">
+                <span className="text-[11px] text-slate-400 mb-1 flex items-center gap-1">
+                  <ArrowDownRight className="w-3 h-3 text-red-400" />
+                  <span>Total Pengeluaran</span>
+                </span>
+                <span className="text-sm sm:text-base font-extrabold text-red-400 tabular-numbers">
+                  {formatIDR(stats?.gender_flow?.pengeluaran_putra || 0)}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Card Putri */}
+          <div className="p-4 sm:p-5 rounded-xl bg-white/[0.04] border border-lime-500/30 space-y-4 hover:border-lime-500/50 transition-colors">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="w-3 h-3 rounded-full bg-lime-400 shadow-[0_0_8px_rgba(163,230,53,0.8)]"></span>
+                <span className="text-sm font-bold text-lime-200">Santri Putri</span>
+              </div>
+              <span className="text-xs px-2.5 py-0.5 rounded-full bg-lime-500/20 text-lime-300 border border-lime-500/30 font-semibold">
+                Net: {formatIDR(stats?.gender_flow?.net_putri || 0)}
+              </span>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3 pt-1">
+              <div className="p-3 rounded-lg bg-black/20 border border-white/5">
+                <span className="text-[11px] text-slate-400 mb-1 flex items-center gap-1">
+                  <ArrowUpRight className="w-3 h-3 text-emerald-400" />
+                  <span>Total Pemasukan</span>
+                </span>
+                <span className="text-sm sm:text-base font-extrabold text-emerald-400 tabular-numbers">
+                  {formatIDR(stats?.gender_flow?.pemasukan_putri || 0)}
+                </span>
+              </div>
+              <div className="p-3 rounded-lg bg-black/20 border border-white/5">
+                <span className="text-[11px] text-slate-400 mb-1 flex items-center gap-1">
+                  <ArrowDownRight className="w-3 h-3 text-red-400" />
+                  <span>Total Pengeluaran</span>
+                </span>
+                <span className="text-sm sm:text-base font-extrabold text-red-400 tabular-numbers">
+                  {formatIDR(stats?.gender_flow?.pengeluaran_putri || 0)}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Grid: SMP vs MA Comparison + Quarterly Trend Chart */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Comparison Widget */}

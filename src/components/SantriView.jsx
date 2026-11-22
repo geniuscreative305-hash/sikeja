@@ -292,6 +292,11 @@ export default function SantriView({
                           Histori: {s.riwayat_kelas.length}x
                         </span>
                       )}
+                      {s.beasiswa && s.beasiswa.jenis && s.beasiswa.jenis !== 'Reguler' && (
+                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-lime-400/20 text-lime-300 border border-lime-400/30 whitespace-nowrap font-medium">
+                          ⭐ {s.beasiswa.jenis} ({s.beasiswa.tipe})
+                        </span>
+                      )}
                     </div>
                   </div>
 
@@ -434,6 +439,11 @@ export default function SantriView({
                               title={s.riwayat_kelas.map(r => `${r.tahun_ajaran || ''}: ${r.dari_kelas} → ${r.ke_kelas}`).join('\n')}
                             >
                               Histori: {s.riwayat_kelas.length}x
+                            </span>
+                          )}
+                          {s.beasiswa && s.beasiswa.jenis && s.beasiswa.jenis !== 'Reguler' && (
+                            <span className="text-[10px] px-1.5 py-0.2 rounded bg-lime-400/20 text-lime-300 border border-lime-400/30 whitespace-nowrap font-medium">
+                              ⭐ {s.beasiswa.jenis} ({s.beasiswa.tipe})
                             </span>
                           )}
                         </div>

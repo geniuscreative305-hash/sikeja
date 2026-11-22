@@ -56,7 +56,7 @@ export default function CollectiveReportModal({ isOpen, onClose, settings }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-black/80 backdrop-blur-md animate-fade-in overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-start justify-center p-3 sm:p-5 py-8 sm:py-12 bg-black/80 backdrop-blur-md animate-fade-in overflow-y-auto">
       {/* Floating Action Controls (Hidden when printing) */}
       <div className="fixed top-4 right-4 z-50 flex items-center gap-3 no-print">
         <button

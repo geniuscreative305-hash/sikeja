@@ -72,7 +72,7 @@ Pengelolaan administrasi keuangan pesantren konvensional (syahriah bulanan, uang
 ================================================================================
 ZONA BAWAH: MASTER CONTEXT & LOGIKA SISTEM TERKINI (LIVING CONTEXT)
 ================================================================================
-- Versi Rilis: v2.7.0 (Multi-Section Landing Page & Dynamic Tariff Transparency Edition)
+- Versi Rilis: v2.8.0 (Print Fix, Gender Cashflow Widget, Holiday & Scholarship Discount Edition)
 - Stack Aktif: Next.js 14 App Router, Supabase PostgreSQL, Tailwind CSS 3.4, SheetJS (xlsx).
 - RBAC Enforcement: 
   * Login Publik: Hanya menyediakan tombol demo untuk Tamu (Guest / Read-Only).
@@ -93,4 +93,5 @@ ZONA BAWAH: MASTER CONTEXT & LOGIKA SISTEM TERKINI (LIVING CONTEXT)
   * [Revisi v2.5]: Cascade Delete Santri & Auto-Clean Orphaned Keuangan (saat santri dihapus, seluruh tagihan & transaksi di menu keuangan otomatis terhapus bersih; pembersihan otomatis transaksi yatim tanpa santri).
   * [Revisi v2.6]: Animated Counter Statistics & Hero Banner Typing Text Effect (Animasi perhitungan angka populasi santri dari 0 ke nilai target secara 60fps dengan cubic ease-out, headline hero mengetik bergantian 5 fitur otomatis via JavaScript murni, dan kursor ketik berkedip hijau lime neon).
   * [Revisi v2.7]: Multi-Section Landing Page (Full scrollable page dengan smooth-scroll navbar, seksi transparansi tarif bulanan santri putra & putri yang ditarik dinamis dari database setting, grid 4 keunggulan tata kelola keuangan pesantren, seksi alur pembayaran 3 langkah, dan footer resmi pesantren berestetika Dark-Emerald Glassmorphism).
+  * [Revisi v2.8]: Print Modal Top-Clipping Fix (items-start py-8), Widget Arus Kas Putra vs Putri di Dashboard dengan peruntukan pos pengeluaran, Sistem Diskon Libur Pondok & Diskon Beasiswa Santri (Prestasi & Afirmasi - Full/Parsial terintegrasi otomatis ke generator tagihan), dan Akselerasi Animasi Hero Landing Page 0-Delay.
 

@@ -5,6 +5,7 @@ import { formatIDR } from './DashboardView';
 export default function ExpenseModal({ isOpen, onClose, onSuccess, addToast }) {
   const [nominal, setNominal] = useState('');
   const [keterangan, setKeterangan] = useState('');
+  const [peruntukan, setPeruntukan] = useState('Umum');
   const [metodeBayar, setMetodeBayar] = useState('Cash');
   const [loading, setLoading] = useState(false);
 
@@ -25,6 +26,9 @@ export default function ExpenseModal({ isOpen, onClose, onSuccess, addToast }) {
     setLoading(true);
     try {
       const token = localStorage.getItem('sikeja_token');
+      const cleanKeterangan = keterangan.trim().replace(/^\[(Umum|Putra|Putri)\]\s*/i, '');
+      const finalKeterangan = `[${peruntukan}] ${cleanKeterangan}`;
+
       const res = await fetch('/api/sikeja', {
         method: 'POST',
         headers: {
@@ -34,7 +38,7 @@ export default function ExpenseModal({ isOpen, onClose, onSuccess, addToast }) {
         body: JSON.stringify({
           action: 'create_expense',
           nominal: amount,
-          keterangan: keterangan.trim(),
+          keterangan: finalKeterangan,
           metode_bayar: metodeBayar,
         }),
       });
@@ -108,6 +112,47 @@ export default function ExpenseModal({ isOpen, onClose, onSuccess, addToast }) {
               placeholder="Contoh: Pembelian beras 10 karung untuk santri putri"
               className="w-full px-3.5 py-2.5 rounded-xl glass-input text-xs text-white resize-none"
             />
+          </div>
+
+          <div>
+            <label className="block text-xs font-semibold text-slate-300 mb-1.5 uppercase tracking-wider">
+              Peruntukan Pos Pengeluaran
+            </label>
+            <div className="grid grid-cols-3 gap-2">
+              <button
+                type="button"
+                onClick={() => setPeruntukan('Umum')}
+                className={`py-2 px-2 rounded-xl border text-xs font-semibold transition-all text-center ${
+                  peruntukan === 'Umum'
+                    ? 'bg-emerald-500/25 text-emerald-300 border-emerald-500/50 shadow-md'
+                    : 'bg-white/[0.04] text-slate-300 border-white/10 hover:bg-white/[0.08]'
+                }`}
+              >
+                Umum
+              </button>
+              <button
+                type="button"
+                onClick={() => setPeruntukan('Putra')}
+                className={`py-2 px-2 rounded-xl border text-xs font-semibold transition-all text-center ${
+                  peruntukan === 'Putra'
+                    ? 'bg-blue-500/25 text-blue-300 border-blue-500/50 shadow-md'
+                    : 'bg-white/[0.04] text-slate-300 border-white/10 hover:bg-white/[0.08]'
+                }`}
+              >
+                Santri Putra
+              </button>
+              <button
+                type="button"
+                onClick={() => setPeruntukan('Putri')}
+                className={`py-2 px-2 rounded-xl border text-xs font-semibold transition-all text-center ${
+                  peruntukan === 'Putri'
+                    ? 'bg-lime-500/25 text-lime-300 border-lime-500/50 shadow-md'
+                    : 'bg-white/[0.04] text-slate-300 border-white/10 hover:bg-white/[0.08]'
+                }`}
+              >
+                Santri Putri
+              </button>
+            </div>
           </div>
 
           <div>

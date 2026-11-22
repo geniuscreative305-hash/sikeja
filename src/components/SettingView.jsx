@@ -9,7 +9,9 @@ import {
   DollarSign, 
   Image as ImageIcon,
   AlertCircle,
-  ShieldCheck
+  ShieldCheck,
+  Calendar,
+  Percent
 } from 'lucide-react';
 import { formatIDR } from './DashboardView';
 
@@ -24,6 +26,9 @@ export default function SettingView({ user, settings, onRefreshSettings, addToas
     jabatan_pejabat: 'Bendahara Umum',
     kop_surat_r2_url: '',
     ttd_r2_url: '',
+    diskon_libur_bulan: '[]',
+    diskon_libur_makan_persen: 100,
+    diskon_libur_syahriah_persen: 0,
   });
 
   const [saving, setSaving] = useState(false);
@@ -44,6 +49,26 @@ export default function SettingView({ user, settings, onRefreshSettings, addToas
       ...prev,
       [field]: value,
     }));
+  };
+
+  const getSelectedHolidayMonths = () => {
+    try {
+      const parsed = JSON.parse(form.diskon_libur_bulan || '[]');
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return [];
+    }
+  };
+
+  const toggleHolidayMonth = (monthNumber) => {
+    const current = getSelectedHolidayMonths();
+    let next;
+    if (current.includes(monthNumber)) {
+      next = current.filter((m) => m !== monthNumber);
+    } else {
+      next = [...current, monthNumber].sort((a, b) => a - b);
+    }
+    handleChange('diskon_libur_bulan', JSON.stringify(next));
   };
 
   const handleSaveTextSettings = async (e) => {
@@ -72,6 +97,9 @@ export default function SettingView({ user, settings, onRefreshSettings, addToas
             alamat_pesantren: form.alamat_pesantren,
             nama_pejabat: form.nama_pejabat,
             jabatan_pejabat: form.jabatan_pejabat,
+            diskon_libur_bulan: form.diskon_libur_bulan || '[]',
+            diskon_libur_makan_persen: form.diskon_libur_makan_persen ?? 100,
+            diskon_libur_syahriah_persen: form.diskon_libur_syahriah_persen ?? 0,
           },
         }),
       });
@@ -233,6 +261,97 @@ export default function SettingView({ user, settings, onRefreshSettings, addToas
               <p className="text-[11px] text-lime-400 mt-1">
                 Terbaca: {formatIDR(form.uang_makan)}
               </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Section Diskon Libur Pondok */}
+        <div className="glass-panel p-6 rounded-2xl space-y-4">
+          <div className="flex items-center justify-between pb-3 border-b border-white/10">
+            <div className="flex items-center gap-2.5">
+              <div className="p-2 rounded-xl bg-lime-500/20 text-lime-300 border border-lime-500/30">
+                <Calendar className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="font-bold text-white text-base">Pengaturan Diskon Libur Pondok</h3>
+                <p className="text-xs text-slate-400">Pilih bulan libur santri untuk pemotongan tagihan makan/syahriah otomatis saat generate tagihan</p>
+              </div>
+            </div>
+            {getSelectedHolidayMonths().length > 0 && (
+              <span className="px-2.5 py-1 text-xs font-bold rounded-full bg-lime-500/20 text-lime-300 border border-lime-500/30">
+                {getSelectedHolidayMonths().length} Bulan Libur Aktif
+              </span>
+            )}
+          </div>
+
+          <div className="space-y-4 pt-1">
+            <div>
+              <label className="block text-xs font-semibold text-slate-300 mb-2 uppercase tracking-wider">
+                Pilih Bulan Libur Santri (Klik untuk aktifkan/nonaktifkan)
+              </label>
+              <div className="grid grid-cols-3 sm:grid-cols-6 lg:grid-cols-12 gap-2">
+                {[
+                  'Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun',
+                  'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'
+                ].map((name, idx) => {
+                  const mNum = idx + 1;
+                  const isSelected = getSelectedHolidayMonths().includes(mNum);
+                  return (
+                    <button
+                      key={idx}
+                      type="button"
+                      disabled={isGuest}
+                      onClick={() => toggleHolidayMonth(mNum)}
+                      className={`py-2 px-1.5 rounded-xl text-xs font-bold border transition-all text-center ${
+                        isSelected
+                          ? 'bg-lime-500/30 text-lime-300 border-lime-500/60 shadow-md shadow-lime-950/40 scale-105'
+                          : 'bg-white/[0.03] text-slate-400 border-white/10 hover:text-white hover:bg-white/5'
+                      } disabled:opacity-50`}
+                    >
+                      {name}
+                      {isSelected && <span className="block text-[9px] text-lime-400">Libur</span>}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+              <div>
+                <label className="block text-xs font-semibold text-slate-300 mb-1.5 uppercase tracking-wider">
+                  Potongan Uang Makan Saat Libur (%)
+                </label>
+                <input
+                  type="number"
+                  min="0"
+                  max="100"
+                  disabled={isGuest}
+                  value={form.diskon_libur_makan_persen}
+                  onChange={(e) => handleChange('diskon_libur_makan_persen', parseFloat(e.target.value) || 0)}
+                  className="w-full px-3.5 py-2.5 rounded-xl glass-input text-sm text-white font-bold tabular-numbers disabled:opacity-50"
+                />
+                <p className="text-[11px] text-slate-400 mt-1">
+                  100% = Bebas biaya makan (santri makan di rumah saat libur)
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-300 mb-1.5 uppercase tracking-wider">
+                  Potongan Syahriah/SPP Saat Libur (%)
+                </label>
+                <input
+                  type="number"
+                  min="0"
+                  max="100"
+                  disabled={isGuest}
+                  value={form.diskon_libur_syahriah_persen}
+                  onChange={(e) => handleChange('diskon_libur_syahriah_persen', parseFloat(e.target.value) || 0)}
+                  className="w-full px-3.5 py-2.5 rounded-xl glass-input text-sm text-white font-bold tabular-numbers disabled:opacity-50"
+                />
+                <p className="text-[11px] text-slate-400 mt-1">
+                  0% = Syahriah tetap penuh, atau sesuaikan persentase diskon
+                </p>
+              </div>
             </div>
           </div>
         </div>

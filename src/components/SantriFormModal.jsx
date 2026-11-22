@@ -10,6 +10,11 @@ export default function SantriFormModal({ isOpen, onClose, onSuccess, addToast, 
   const [namaWali, setNamaWali] = useState('');
   const [noHp, setNoHp] = useState('');
   const [status, setStatus] = useState('Aktif');
+  const [beasiswaJenis, setBeasiswaJenis] = useState('Reguler');
+  const [beasiswaTipe, setBeasiswaTipe] = useState('Full');
+  const [bebasSyahriah, setBebasSyahriah] = useState(true);
+  const [bebasMakan, setBebasMakan] = useState(false);
+  const [nominalPotongan, setNominalPotongan] = useState(0);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -25,6 +30,19 @@ export default function SantriFormModal({ isOpen, onClose, onSuccess, addToast, 
         editingSantri.status ||
         (editingSantri.status_aktif === false ? 'Nonaktif' : 'Aktif')
       );
+      if (editingSantri.beasiswa) {
+        setBeasiswaJenis(editingSantri.beasiswa.jenis || 'Reguler');
+        setBeasiswaTipe(editingSantri.beasiswa.tipe || 'Full');
+        setBebasSyahriah(editingSantri.beasiswa.bebas_syahriah ?? true);
+        setBebasMakan(editingSantri.beasiswa.bebas_makan ?? false);
+        setNominalPotongan(editingSantri.beasiswa.nominal_potongan || 0);
+      } else {
+        setBeasiswaJenis('Reguler');
+        setBeasiswaTipe('Full');
+        setBebasSyahriah(true);
+        setBebasMakan(false);
+        setNominalPotongan(0);
+      }
     } else {
       // Auto recommend NIS format with current year
       const y = new Date().getFullYear();
@@ -36,6 +54,11 @@ export default function SantriFormModal({ isOpen, onClose, onSuccess, addToast, 
       setNamaWali('');
       setNoHp('');
       setStatus('Aktif');
+      setBeasiswaJenis('Reguler');
+      setBeasiswaTipe('Full');
+      setBebasSyahriah(true);
+      setBebasMakan(false);
+      setNominalPotongan(0);
     }
   }, [editingSantri, isOpen]);
 
@@ -69,6 +92,13 @@ export default function SantriFormModal({ isOpen, onClose, onSuccess, addToast, 
           no_hp: noHp.trim(),
           status,
           status_aktif: status === 'Aktif',
+          beasiswa: {
+            jenis: beasiswaJenis,
+            tipe: beasiswaTipe,
+            bebas_syahriah: bebasSyahriah,
+            bebas_makan: bebasMakan,
+            nominal_potongan: parseFloat(nominalPotongan) || 0,
+          },
         }),
       });
 
@@ -255,6 +285,133 @@ export default function SantriFormModal({ isOpen, onClose, onSuccess, addToast, 
                 🎓 Lulus (Alumni)
               </button>
             </div>
+          </div>
+
+          {/* Beasiswa & Diskon Biaya Section */}
+          <div className="p-3.5 rounded-xl bg-white/[0.04] border border-emerald-500/30 space-y-3">
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="text-xs font-bold text-emerald-300">Program Beasiswa & Diskon</div>
+                <div className="text-[11px] text-slate-400">
+                  Keringanan biaya bagi santri berprestasi atau afirmasi
+                </div>
+              </div>
+              {beasiswaJenis !== 'Reguler' && (
+                <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                  {beasiswaTipe === 'Full' ? 'Bebas 100%' : 'Parsial'}
+                </span>
+              )}
+            </div>
+
+            {/* Kategori Beasiswa */}
+            <div className="grid grid-cols-3 gap-2">
+              <button
+                type="button"
+                onClick={() => setBeasiswaJenis('Reguler')}
+                className={`py-2 px-2 rounded-xl text-xs font-semibold border transition-all text-center ${
+                  beasiswaJenis === 'Reguler'
+                    ? 'bg-slate-700/60 text-white border-white/30 shadow-md'
+                    : 'bg-white/[0.02] text-slate-400 border-white/10 hover:text-white'
+                }`}
+              >
+                Reguler
+              </button>
+              <button
+                type="button"
+                onClick={() => setBeasiswaJenis('Prestasi')}
+                className={`py-2 px-2 rounded-xl text-xs font-semibold border transition-all text-center ${
+                  beasiswaJenis === 'Prestasi'
+                    ? 'bg-emerald-500/25 text-emerald-300 border-emerald-500/50 shadow-md'
+                    : 'bg-white/[0.02] text-slate-400 border-white/10 hover:text-white'
+                }`}
+              >
+                Prestasi
+              </button>
+              <button
+                type="button"
+                onClick={() => setBeasiswaJenis('Keluarga Tidak Mampu')}
+                className={`py-2 px-2 rounded-xl text-xs font-semibold border transition-all text-center ${
+                  beasiswaJenis === 'Keluarga Tidak Mampu'
+                    ? 'bg-amber-500/25 text-amber-300 border-amber-500/50 shadow-md'
+                    : 'bg-white/[0.02] text-slate-400 border-white/10 hover:text-white'
+                }`}
+              >
+                Afirmasi / Dhuafa
+              </button>
+            </div>
+
+            {/* Detail Beasiswa jika bukan Reguler */}
+            {beasiswaJenis !== 'Reguler' && (
+              <div className="pt-2 border-t border-white/10 space-y-3 animate-fade-in">
+                <div className="flex items-center gap-3">
+                  <span className="text-xs text-slate-300">Tipe Keringanan:</span>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setBeasiswaTipe('Full')}
+                      className={`px-3 py-1 rounded-lg text-xs font-semibold border transition-all ${
+                        beasiswaTipe === 'Full'
+                          ? 'bg-emerald-500 text-slate-950 border-emerald-400 font-bold'
+                          : 'bg-white/[0.04] text-slate-300 border-white/10'
+                      }`}
+                    >
+                      Full (100% Bebas Biaya)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setBeasiswaTipe('Sebagian')}
+                      className={`px-3 py-1 rounded-lg text-xs font-semibold border transition-all ${
+                        beasiswaTipe === 'Sebagian'
+                          ? 'bg-teal-500 text-slate-950 border-teal-400 font-bold'
+                          : 'bg-white/[0.04] text-slate-300 border-white/10'
+                      }`}
+                    >
+                      Sebagian (Parsial)
+                    </button>
+                  </div>
+                </div>
+
+                {beasiswaTipe === 'Sebagian' && (
+                  <div className="space-y-2 pt-1">
+                    <div className="flex flex-wrap items-center gap-4 text-xs text-slate-300">
+                      <label className="flex items-center gap-2 cursor-pointer select-none">
+                        <input
+                          type="checkbox"
+                          checked={bebasSyahriah}
+                          onChange={(e) => setBebasSyahriah(e.target.checked)}
+                          className="rounded border-white/20 text-emerald-500 focus:ring-0 bg-slate-900"
+                        />
+                        <span>Bebas Syahriah (SPP)</span>
+                      </label>
+                      <label className="flex items-center gap-2 cursor-pointer select-none">
+                        <input
+                          type="checkbox"
+                          checked={bebasMakan}
+                          onChange={(e) => setBebasMakan(e.target.checked)}
+                          className="rounded border-white/20 text-emerald-500 focus:ring-0 bg-slate-900"
+                        />
+                        <span>Bebas Uang Makan</span>
+                      </label>
+                    </div>
+
+                    <div>
+                      <label className="block text-[11px] text-slate-400 mb-1">
+                        Potongan Nominal Khusus Tambahan (Rp)
+                      </label>
+                      <input
+                        type="number"
+                        min="0"
+                        step="5000"
+                        value={nominalPotongan}
+                        onChange={(e) => setNominalPotongan(e.target.value)}
+                        placeholder="Contoh: 150000"
+                        className="w-full px-3 py-1.5 rounded-lg glass-input text-xs text-white"
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           <div className="flex items-center justify-end gap-3 pt-4 border-t border-white/10">
