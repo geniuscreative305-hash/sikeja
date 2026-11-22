@@ -89,14 +89,14 @@ async function getSettingsMap() {
     nama_pejabat: 'KH. Ahmad Fauzi',
     jabatan_pejabat: 'Bendahara Umum',
     diskon_libur_bulan: '[]',
-    diskon_libur_makan_persen: 100,
-    diskon_libur_syahriah_persen: 0,
+    diskon_libur_makan_nominal: 380000,
+    diskon_libur_syahriah_nominal: 0,
     beasiswa_santri_config: '{}',
   };
 
   if (!error && data) {
     data.forEach((item) => {
-      if (['syahriah_putra', 'syahriah_putri', 'uang_makan', 'diskon_libur_makan_persen', 'diskon_libur_syahriah_persen'].includes(item.key)) {
+      if (['syahriah_putra', 'syahriah_putri', 'uang_makan', 'diskon_libur_makan_nominal', 'diskon_libur_syahriah_nominal', 'diskon_libur_makan_persen', 'diskon_libur_syahriah_persen'].includes(item.key)) {
         settings[item.key] = parseFloat(item.value) || 0;
       } else {
         settings[item.key] = item.value || '';
@@ -897,7 +897,7 @@ export async function POST(request) {
       const syahriahPutri = settings.syahriah_putri;
       const uangMakan = settings.uang_makan;
 
-      // 1. Check Diskon Libur for month b
+      // 1. Check Diskon Libur for month b (Direct Nominal Deduction)
       let holidayMonths = [];
       try {
         holidayMonths = JSON.parse(settings.diskon_libur_bulan || '[]');
@@ -905,12 +905,20 @@ export async function POST(request) {
         holidayMonths = [];
       }
       const isHoliday = Array.isArray(holidayMonths) && holidayMonths.includes(b);
-      const makanDiscountPercent = isHoliday ? (parseFloat(settings.diskon_libur_makan_persen) || 100) : 0;
-      const syahriahDiscountPercent = isHoliday ? (parseFloat(settings.diskon_libur_syahriah_persen) || 0) : 0;
+      const makanPotonganNominal = isHoliday 
+        ? (settings.diskon_libur_makan_nominal !== undefined 
+            ? parseFloat(settings.diskon_libur_makan_nominal) 
+            : uangMakan)
+        : 0;
+      const syahriahPotonganNominal = isHoliday 
+        ? (settings.diskon_libur_syahriah_nominal !== undefined 
+            ? parseFloat(settings.diskon_libur_syahriah_nominal) 
+            : 0)
+        : 0;
 
-      const effectiveMakan = Math.max(0, Math.round(uangMakan * (1 - makanDiscountPercent / 100)));
-      const effectiveSyahriahPutra = Math.max(0, Math.round(syahriahPutra * (1 - syahriahDiscountPercent / 100)));
-      const effectiveSyahriahPutri = Math.max(0, Math.round(syahriahPutri * (1 - syahriahDiscountPercent / 100)));
+      const effectiveMakan = Math.max(0, uangMakan - makanPotonganNominal);
+      const effectiveSyahriahPutra = Math.max(0, syahriahPutra - syahriahPotonganNominal);
+      const effectiveSyahriahPutri = Math.max(0, syahriahPutri - syahriahPotonganNominal);
 
       // 2. Load Beasiswa Config
       let beasiswaMap = {};

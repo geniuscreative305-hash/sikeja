@@ -27,8 +27,8 @@ export default function SettingView({ user, settings, onRefreshSettings, addToas
     kop_surat_r2_url: '',
     ttd_r2_url: '',
     diskon_libur_bulan: '[]',
-    diskon_libur_makan_persen: 100,
-    diskon_libur_syahriah_persen: 0,
+    diskon_libur_makan_nominal: 380000,
+    diskon_libur_syahriah_nominal: 0,
   });
 
   const [saving, setSaving] = useState(false);
@@ -98,8 +98,8 @@ export default function SettingView({ user, settings, onRefreshSettings, addToas
             nama_pejabat: form.nama_pejabat,
             jabatan_pejabat: form.jabatan_pejabat,
             diskon_libur_bulan: form.diskon_libur_bulan || '[]',
-            diskon_libur_makan_persen: form.diskon_libur_makan_persen ?? 100,
-            diskon_libur_syahriah_persen: form.diskon_libur_syahriah_persen ?? 0,
+            diskon_libur_makan_nominal: form.diskon_libur_makan_nominal ?? 380000,
+            diskon_libur_syahriah_nominal: form.diskon_libur_syahriah_nominal ?? 0,
           },
         }),
       });
@@ -319,37 +319,37 @@ export default function SettingView({ user, settings, onRefreshSettings, addToas
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
               <div>
                 <label className="block text-xs font-semibold text-slate-300 mb-1.5 uppercase tracking-wider">
-                  Potongan Uang Makan Saat Libur (%)
+                  Potongan Uang Makan Saat Libur (Rp)
                 </label>
                 <input
                   type="number"
                   min="0"
-                  max="100"
+                  step="5000"
                   disabled={isGuest}
-                  value={form.diskon_libur_makan_persen}
-                  onChange={(e) => handleChange('diskon_libur_makan_persen', parseFloat(e.target.value) || 0)}
+                  value={form.diskon_libur_makan_nominal}
+                  onChange={(e) => handleChange('diskon_libur_makan_nominal', parseFloat(e.target.value) || 0)}
                   className="w-full px-3.5 py-2.5 rounded-xl glass-input text-sm text-white font-bold tabular-numbers disabled:opacity-50"
                 />
-                <p className="text-[11px] text-slate-400 mt-1">
-                  100% = Bebas biaya makan (santri makan di rumah saat libur)
+                <p className="text-[11px] text-lime-400 mt-1">
+                  Terbaca: {formatIDR(form.diskon_libur_makan_nominal)} (Potongan makan saat libur)
                 </p>
               </div>
 
               <div>
                 <label className="block text-xs font-semibold text-slate-300 mb-1.5 uppercase tracking-wider">
-                  Potongan Syahriah/SPP Saat Libur (%)
+                  Potongan Syahriah/SPP Saat Libur (Rp)
                 </label>
                 <input
                   type="number"
                   min="0"
-                  max="100"
+                  step="5000"
                   disabled={isGuest}
-                  value={form.diskon_libur_syahriah_persen}
-                  onChange={(e) => handleChange('diskon_libur_syahriah_persen', parseFloat(e.target.value) || 0)}
+                  value={form.diskon_libur_syahriah_nominal}
+                  onChange={(e) => handleChange('diskon_libur_syahriah_nominal', parseFloat(e.target.value) || 0)}
                   className="w-full px-3.5 py-2.5 rounded-xl glass-input text-sm text-white font-bold tabular-numbers disabled:opacity-50"
                 />
                 <p className="text-[11px] text-slate-400 mt-1">
-                  0% = Syahriah tetap penuh, atau sesuaikan persentase diskon
+                  Terbaca: {formatIDR(form.diskon_libur_syahriah_nominal)} (Isi 0 jika syahriah tetap penuh)
                 </p>
               </div>
             </div>
