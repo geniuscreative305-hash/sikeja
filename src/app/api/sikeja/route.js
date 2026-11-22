@@ -435,6 +435,7 @@ export async function GET(request) {
       const search = searchParams.get('search') || '';
       const jenjang = searchParams.get('jenjang') || '';
       const gender = searchParams.get('gender') || '';
+      const kelas = searchParams.get('kelas') || '';
       const status = searchParams.get('status') || '';
       const status_aktif = searchParams.get('status_aktif');
 
@@ -450,6 +451,9 @@ export async function GET(request) {
       }
       if (gender) {
         query = query.eq('gender', gender);
+      }
+      if (kelas) {
+        query = query.eq('kelas', kelas);
       }
       if (status) {
         query = query.eq('status', status);
@@ -501,8 +505,14 @@ export async function GET(request) {
         },
       }));
 
+      const { data: classRows } = await supabaseAdmin
+        .from('santri')
+        .select('kelas, jenjang')
+        .not('kelas', 'is', null);
+
       return NextResponse.json({
         data: enhancedSantri,
+        classes: classRows || [],
         pagination: {
           total: count || enhancedSantri.length,
           page,

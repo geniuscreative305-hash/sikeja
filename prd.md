@@ -72,7 +72,7 @@ Pengelolaan administrasi keuangan pesantren konvensional (syahriah bulanan, uang
 ================================================================================
 ZONA BAWAH: MASTER CONTEXT & LOGIKA SISTEM TERKINI (LIVING CONTEXT)
 ================================================================================
-- Versi Rilis: v2.3.0 (Zero-Delay Instant Hydration & Babakan Jamanis Identity Edition)
+- Versi Rilis: v2.4.0 (Smart Class Filter & Academic Management Edition)
 - Stack Aktif: Next.js 14 App Router, Supabase PostgreSQL, Tailwind CSS 3.4, SheetJS (xlsx).
 - RBAC Enforcement: 
   * Login Publik: Hanya menyediakan tombol demo untuk Tamu (Guest / Read-Only).
@@ -89,4 +89,5 @@ ZONA BAWAH: MASTER CONTEXT & LOGIKA SISTEM TERKINI (LIVING CONTEXT)
   * [Revisi v2.1]: Koreksi Lokasi Cetak TTD Laporan PDF (Kediri -> Parigi) dan pemutakhiran alamat resmi fallback pesantren.
   * [Revisi v2.2]: Penambahan Fitur Cetak Laporan Tahunan Khusus Per Santri (12 Bulan / 1 Tahun Penuh) dengan filter terpadu (Kuartal Q1-Q4 vs 1 Tahun Penuh), rekapitulasi totalan 1 tahun, dan format A4 proporsional.
   * [Revisi v2.3]: Optimasi Kecepatan 0-Delay (Instant LocalStorage Hydration + Parallel Promise.all API Backend) dan pembersihan total nama pesantren menjadi "Pondok Pesantren Babakan Jamanis" di seluruh fallback UI, kwitansi, dan laporan resmi.
+  * [Revisi v2.4]: Penambahan Filter Kelas Cerdas pada Menu Data Santri (sinkronisasi opsi dinamis berdasarkan jenjang aktif, backend filter `kelas`, dan layout filter bar responsif 4-kolom).
 

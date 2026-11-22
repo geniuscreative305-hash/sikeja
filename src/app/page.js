@@ -22,14 +22,14 @@ import SantriFormModal from '@/components/SantriFormModal';
 import ExcelImportModal from '@/components/ExcelImportModal';
 import NaikKelasModal from '@/components/NaikKelasModal';
 
-import { 
-  Building2, 
-  Menu, 
-  RefreshCw, 
-  Bell, 
-  Calendar, 
-  ShieldCheck, 
-  Users 
+import {
+  Building2,
+  Menu,
+  RefreshCw,
+  Bell,
+  Calendar,
+  ShieldCheck,
+  Users
 } from 'lucide-react';
 
 export default function AppRoot() {
@@ -101,12 +101,12 @@ export default function AppRoot() {
         if (storedSettings) {
           try {
             setSettings(JSON.parse(storedSettings));
-          } catch {}
+          } catch { }
         }
         if (storedStats) {
           try {
             setDashboardStats(JSON.parse(storedStats));
-          } catch {}
+          } catch { }
         }
       } catch {
         localStorage.removeItem('sikeja_token');
@@ -285,9 +285,8 @@ export default function AppRoot() {
 
       {/* Main Content Area */}
       <div
-        className={`flex-1 flex flex-col min-h-screen min-w-0 transition-all duration-300 w-full ${
-          isCollapsed ? 'lg:pl-20' : 'lg:pl-64'
-        }`}
+        className={`flex-1 flex flex-col min-h-screen min-w-0 transition-all duration-300 w-full ${isCollapsed ? 'lg:pl-20' : 'lg:pl-64'
+          }`}
       >
         {/* Top Header Bar */}
         <header className="sticky top-0 z-30 h-16 border-b border-white/10 backdrop-blur-xl bg-[#0b2239]/80 px-3 sm:px-6 lg:px-8 flex items-center justify-between no-print min-w-0">
@@ -305,11 +304,10 @@ export default function AppRoot() {
               <span className="font-extrabold text-sm sm:text-base text-white tracking-tight truncate max-w-[140px] sm:max-w-xs md:max-w-md">
                 {settings?.nama_pesantren || 'Pondok Pesantren Babakan Jamanis'}
               </span>
-              <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border shrink-0 whitespace-nowrap ${
-                user.role === 'Admin'
+              <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border shrink-0 whitespace-nowrap ${user.role === 'Admin'
                   ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30'
                   : 'bg-lime-500/20 text-lime-300 border-lime-500/30'
-              }`}>
+                }`}>
                 {user.role === 'Admin' ? 'Admin Utama' : 'Tamu (Read-Only)'}
               </span>
             </div>

@@ -34,10 +34,21 @@ export default function SantriView({
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState('');
   const [jenjang, setJenjang] = useState('');
+  const [kelas, setKelas] = useState('');
+  const [allClasses, setAllClasses] = useState([]);
   const [gender, setGender] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [page, setPage] = useState(1);
   const [pagination, setPagination] = useState({ total: 0, totalPages: 1, limit: 15 });
+
+  const availableClassOptions = React.useMemo(() => {
+    let filtered = allClasses;
+    if (jenjang) {
+      filtered = filtered.filter((c) => c.jenjang === jenjang);
+    }
+    const unique = Array.from(new Set(filtered.map((c) => c.kelas).filter(Boolean)));
+    return unique.sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
+  }, [allClasses, jenjang]);
 
   const fetchSantri = async () => {
     setLoading(true);
@@ -46,6 +57,7 @@ export default function SantriView({
       let url = `/api/sikeja?type=santri&page=${page}&limit=15`;
       if (search) url += `&search=${encodeURIComponent(search)}`;
       if (jenjang) url += `&jenjang=${encodeURIComponent(jenjang)}`;
+      if (kelas) url += `&kelas=${encodeURIComponent(kelas)}`;
       if (gender) url += `&gender=${encodeURIComponent(gender)}`;
       if (statusFilter) url += `&status=${encodeURIComponent(statusFilter)}`;
 
@@ -56,6 +68,9 @@ export default function SantriView({
       if (data && data.data) {
         setSantriList(data.data);
         setPagination(data.pagination || { total: data.data.length, totalPages: 1, limit: 15 });
+        if (data.classes && data.classes.length > 0) {
+          setAllClasses(data.classes);
+        }
       }
     } catch (err) {
       console.error('Error fetching santri list:', err);
@@ -66,7 +81,7 @@ export default function SantriView({
 
   useEffect(() => {
     fetchSantri();
-  }, [page, jenjang, gender, statusFilter, refreshTrigger]);
+  }, [page, jenjang, kelas, gender, statusFilter, refreshTrigger]);
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
@@ -125,14 +140,14 @@ export default function SantriView({
       <div className="glass-panel p-3.5 sm:p-4 rounded-2xl space-y-3">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-2.5 sm:gap-3">
           {/* Search Box */}
-          <form onSubmit={handleSearchSubmit} className="md:col-span-5 relative">
+          <form onSubmit={handleSearchSubmit} className="md:col-span-4 relative">
             <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Cari nama santri, NIS, atau kelas..."
-              className="w-full pl-10 pr-20 py-2.5 sm:py-2 rounded-xl glass-input text-xs text-white placeholder-slate-400"
+              placeholder="Cari nama, NIS, kelas..."
+              className="w-full pl-10 pr-16 py-2.5 sm:py-2 rounded-xl glass-input text-xs text-white placeholder-slate-400"
             />
             <button
               type="submit"
@@ -142,19 +157,39 @@ export default function SantriView({
             </button>
           </form>
 
-          {/* Filters Grid for Mobile (2 cols on mobile, 7 cols on desktop) */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:col-span-7 gap-2">
+          {/* Filters Grid (2 cols mobile, 4 cols sm/md) */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 md:col-span-8 gap-2">
             {/* Jenjang Filter */}
             <div>
               <select
                 value={jenjang}
-                onChange={(e) => { setJenjang(e.target.value); setPage(1); }}
+                onChange={(e) => { 
+                  setJenjang(e.target.value); 
+                  setKelas(''); 
+                  setPage(1); 
+                }}
                 className="w-full px-2.5 py-2 rounded-xl glass-input text-xs text-white"
               >
                 <option value="" className="bg-slate-900">Semua Jenjang</option>
                 <option value="SMP" className="bg-slate-900">Unit SMP</option>
                 <option value="MA" className="bg-slate-900">Unit MA</option>
                 <option value="Mahasiswa" className="bg-slate-900">Mahasiswa (INN)</option>
+              </select>
+            </div>
+
+            {/* Kelas Filter */}
+            <div>
+              <select
+                value={kelas}
+                onChange={(e) => { setKelas(e.target.value); setPage(1); }}
+                className="w-full px-2.5 py-2 rounded-xl glass-input text-xs text-white"
+              >
+                <option value="" className="bg-slate-900">Semua Kelas</option>
+                {availableClassOptions.map((cls, idx) => (
+                  <option key={idx} value={cls} className="bg-slate-900">
+                    Kelas: {cls}
+                  </option>
+                ))}
               </select>
             </div>
 
@@ -172,7 +207,7 @@ export default function SantriView({
             </div>
 
             {/* Status Santri (Aktif, Nonaktif, Lulus) */}
-            <div className="col-span-2 sm:col-span-1">
+            <div>
               <select
                 value={statusFilter}
                 onChange={(e) => { setStatusFilter(e.target.value); setPage(1); }}
