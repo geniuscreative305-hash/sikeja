@@ -8,7 +8,7 @@ STANDAR: UI-UX-PRO-MAX (Academic Continuity, Financial Integrity, Batch Processi
 ## 1. Analisis Kebutuhan & Akar Masalah
 
 ### Poin 1: Penambahan Tingkat Pendidikan "Mahasiswa"
-- **Kebutuhan**: Pesantren Al-Farabi menaungi perguruan tinggi (Institut Nasional Nusantara / INN Al-Farabi), sehingga jenjang santri kini meliputi: **SMP**, **MA**, dan **Mahasiswa**.
+- **Kebutuhan**: Pondok Pesantren Babakan Jamanis menaungi perguruan tinggi (Institut Nasional Nusantara / INN), sehingga jenjang santri kini meliputi: **SMP**, **MA**, dan **Mahasiswa**.
 - **Dampak Database**: Constraint check pada tabel `santri(jenjang)` di Supabase harus diperbarui dari `('SMP', 'MA')` menjadi `('SMP', 'MA', 'Mahasiswa')`.
 - **Dampak UI**: Semua filter, form pendaftaran santri, dan komparasi dasbor diselaraskan dengan 3 jenjang ini.
 

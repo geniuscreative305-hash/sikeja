@@ -72,13 +72,13 @@ Pengelolaan administrasi keuangan pesantren konvensional (syahriah bulanan, uang
 ================================================================================
 ZONA BAWAH: MASTER CONTEXT & LOGIKA SISTEM TERKINI (LIVING CONTEXT)
 ================================================================================
-- Versi Rilis: v2.2.0 (Individual Annual Report & Multi-Period Reporting Edition)
+- Versi Rilis: v2.3.0 (Zero-Delay Instant Hydration & Babakan Jamanis Identity Edition)
 - Stack Aktif: Next.js 14 App Router, Supabase PostgreSQL, Tailwind CSS 3.4, SheetJS (xlsx).
 - RBAC Enforcement: 
   * Login Publik: Hanya menyediakan tombol demo untuk Tamu (Guest / Read-Only).
   * Admin: Akun privat pengurus, full CRUD, tidak bisa diakses publik secara sengaja/tak sengaja.
 - Waktu Baku: Asia/Jakarta (WIB) pada transaksi dan stempel cetak.
-- Alamat & Identitas Resmi: Jln. Cigugur KM 03 Pasirkiara Karangbenda Kec. Parigi Kab. Pangandaran Prov. Jawa Barat 46393 (Lokasi TTD: Parigi).
+- Alamat & Identitas Resmi: Pondok Pesantren Babakan Jamanis, Jln. Cigugur KM 03 Pasirkiara Karangbenda Kec. Parigi Kab. Pangandaran Prov. Jawa Barat 46393 (Lokasi TTD: Parigi).
 - Asset Storage: Disimpan langsung ke PostgreSQL Supabase (Base64) tanpa Cloudflare R2 (100% Free, No Credit Card).
 - UI/UX & Layout: Collapsible Sidebar dengan floating pill toggle (-right-3.5), mobile drawer, fluid typography, Plus Jakarta Sans via next/font/google.
 - Riwayat Pembaruan Terkini:
@@ -88,4 +88,5 @@ ZONA BAWAH: MASTER CONTEXT & LOGIKA SISTEM TERKINI (LIVING CONTEXT)
   * [Revisi v2.0]: 6 Fitur Utama: Jenjang Mahasiswa, Filter Komprehensif Laporan Cetak PDF & CSV (Gender, Kelas, Jenjang, Status), Import Data Santri Excel (.xlsx) dengan Template Resmi & Validasi, Fix Akumulasi Pelunasan Tagihan Sebagian -> Lunas, Kenaikan Kelas & Arsip Riwayat Akademik (JSONB), serta Status Santri 3-State (Aktif, Nonaktif, Lulus).
   * [Revisi v2.1]: Koreksi Lokasi Cetak TTD Laporan PDF (Kediri -> Parigi) dan pemutakhiran alamat resmi fallback pesantren.
   * [Revisi v2.2]: Penambahan Fitur Cetak Laporan Tahunan Khusus Per Santri (12 Bulan / 1 Tahun Penuh) dengan filter terpadu (Kuartal Q1-Q4 vs 1 Tahun Penuh), rekapitulasi totalan 1 tahun, dan format A4 proporsional.
+  * [Revisi v2.3]: Optimasi Kecepatan 0-Delay (Instant LocalStorage Hydration + Parallel Promise.all API Backend) dan pembersihan total nama pesantren menjadi "Pondok Pesantren Babakan Jamanis" di seluruh fallback UI, kwitansi, dan laporan resmi.
 

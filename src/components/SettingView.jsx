@@ -18,7 +18,7 @@ export default function SettingView({ user, settings, onRefreshSettings, addToas
     syahriah_putra: 75000,
     syahriah_putri: 100000,
     uang_makan: 380000,
-    nama_pesantren: 'Pondok Pesantren Al-Farabi',
+    nama_pesantren: 'Pondok Pesantren Babakan Jamanis',
     alamat_pesantren: 'Jln. Cigugur KM 03 Pasirkiara Karangbenda Kec. Parigi Kab. Pangandaran Prov. Jawa Barat 46393',
     nama_pejabat: 'KH. Ahmad Fauzi',
     jabatan_pejabat: 'Bendahara Umum',

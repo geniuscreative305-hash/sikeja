@@ -45,7 +45,9 @@ export default function AppRoot() {
   const [keuanganInitialFilter, setKeuanganInitialFilter] = useState({});
 
   // Global settings & dashboard stats state
-  const [settings, setSettings] = useState(null);
+  const [settings, setSettings] = useState({
+    nama_pesantren: 'Pondok Pesantren Babakan Jamanis',
+  });
   const [dashboardStats, setDashboardStats] = useState(null);
   const [statsLoading, setStatsLoading] = useState(false);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
@@ -85,15 +87,27 @@ export default function AppRoot() {
     setToasts((prev) => prev.filter((t) => t.id !== id));
   };
 
-  // 1. Initial Auth Check from LocalStorage
+  // 1. Initial Auth Check from LocalStorage & Instant Cache Hydration
   useEffect(() => {
     const storedToken = localStorage.getItem('sikeja_token');
     const storedUser = localStorage.getItem('sikeja_user');
+    const storedSettings = localStorage.getItem('sikeja_settings');
+    const storedStats = localStorage.getItem('sikeja_dashboard_stats');
 
     if (storedToken && storedUser) {
       try {
         setToken(storedToken);
         setUser(JSON.parse(storedUser));
+        if (storedSettings) {
+          try {
+            setSettings(JSON.parse(storedSettings));
+          } catch {}
+        }
+        if (storedStats) {
+          try {
+            setDashboardStats(JSON.parse(storedStats));
+          } catch {}
+        }
       } catch {
         localStorage.removeItem('sikeja_token');
         localStorage.removeItem('sikeja_user');
@@ -112,6 +126,7 @@ export default function AppRoot() {
       const data = await res.json();
       if (data && !data.error) {
         setSettings(data);
+        localStorage.setItem('sikeja_settings', JSON.stringify(data));
       }
     } catch (err) {
       console.error('Error fetching settings:', err);
@@ -129,6 +144,7 @@ export default function AppRoot() {
       const data = await res.json();
       if (data && !data.error) {
         setDashboardStats(data);
+        localStorage.setItem('sikeja_dashboard_stats', JSON.stringify(data));
       }
     } catch (err) {
       console.error('Error fetching dashboard stats:', err);
@@ -287,7 +303,7 @@ export default function AppRoot() {
             {/* Institution Badge */}
             <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
               <span className="font-extrabold text-sm sm:text-base text-white tracking-tight truncate max-w-[140px] sm:max-w-xs md:max-w-md">
-                {settings?.nama_pesantren || 'Pondok Pesantren Al-Farabi'}
+                {settings?.nama_pesantren || 'Pondok Pesantren Babakan Jamanis'}
               </span>
               <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border shrink-0 whitespace-nowrap ${
                 user.role === 'Admin'

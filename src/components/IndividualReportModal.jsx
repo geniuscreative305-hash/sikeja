@@ -197,7 +197,7 @@ export default function IndividualReportModal({ isOpen, onClose, settings, initi
             ) : (
               <div className="text-center space-y-1">
                 <h1 className="text-xl font-extrabold uppercase tracking-wider text-slate-950 font-serif">
-                  {settings?.nama_pesantren || 'PONDOK PESANTREN AL-FARABI'}
+                  {settings?.nama_pesantren || 'PONDOK PESANTREN BABAKAN JAMANIS'}
                 </h1>
                 <p className="text-xs text-slate-700 max-w-xl mx-auto">
                   {settings?.alamat_pesantren || 'Jln. Cigugur KM 03 Pasirkiara Karangbenda Kec. Parigi Kab. Pangandaran Prov. Jawa Barat 46393'}

@@ -40,7 +40,7 @@ export default function KwitansiModal({ isOpen, onClose, transaction, settings }
   };
 
   const buildWhatsAppMessage = () => {
-    const pesantrenName = settings?.nama_pesantren || 'Pondok Pesantren Al-Farabi';
+    const pesantrenName = settings?.nama_pesantren || 'Pondok Pesantren Babakan Jamanis';
     const santriName = transaction.santri?.nama_lengkap || '-';
     const nis = transaction.santri?.nis || '-';
     const jenjang = transaction.santri?.jenjang || '-';
@@ -186,7 +186,7 @@ _Harap simpan pesan kwitansi ini sebagai bukti pembayaran yang sah. Diterbitkan 
               />
             ) : null}
             <h2 className="text-base font-bold uppercase tracking-tight text-slate-900 font-sans">
-              {settings?.nama_pesantren || 'Pondok Pesantren Al-Farabi'}
+              {settings?.nama_pesantren || 'Pondok Pesantren Babakan Jamanis'}
             </h2>
             <p className="text-[10px] text-slate-600 font-sans">
               {settings?.alamat_pesantren || 'Jln. Cigugur KM 03 Pasirkiara Karangbenda Kec. Parigi Kab. Pangandaran Prov. Jawa Barat 46393'}

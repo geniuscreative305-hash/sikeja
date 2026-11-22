@@ -82,8 +82,8 @@ async function getSettingsMap() {
     syahriah_putra: 75000,
     syahriah_putri: 100000,
     uang_makan: 380000,
-    nama_pesantren: 'Pondok Pesantren Al-Farabi',
-    alamat_pesantren: 'Jl. Raya Pesantren No. 1',
+    nama_pesantren: 'Pondok Pesantren Babakan Jamanis',
+    alamat_pesantren: 'Jln. Cigugur KM 03 Pasirkiara Karangbenda Kec. Parigi Kab. Pangandaran Prov. Jawa Barat 46393',
     kop_surat_r2_url: '',
     ttd_r2_url: '',
     nama_pejabat: 'KH. Ahmad Fauzi',
@@ -183,22 +183,36 @@ export async function GET(request) {
       const currentMonth = now.getMonth() + 1;
       const currentYear = now.getFullYear();
 
-      // Fetch sum of Pemasukan
-      const { data: pemasukanData } = await supabaseAdmin
-        .from('transaksi')
-        .select('nominal_bayar')
-        .eq('jenis_transaksi', 'Pemasukan');
+      // Fetch all required dashboard datasets in parallel for maximum speed (0ms sequential delay)
+      const [pemasukanRes, pengeluaranRes, currentMonthBillsRes, trendDataRes] = await Promise.all([
+        supabaseAdmin
+          .from('transaksi')
+          .select('nominal_bayar')
+          .eq('jenis_transaksi', 'Pemasukan'),
+        supabaseAdmin
+          .from('transaksi')
+          .select('nominal_bayar')
+          .eq('jenis_transaksi', 'Pengeluaran'),
+        supabaseAdmin
+          .from('transaksi')
+          .select('id, santri_id, status_bayar, santri(jenjang)')
+          .eq('jenis_transaksi', 'Pemasukan')
+          .eq('bulan_tagihan', currentMonth)
+          .eq('tahun_tagihan', currentYear),
+        supabaseAdmin
+          .from('transaksi')
+          .select('jenis_transaksi, nominal_bayar, tanggal_waktu, bulan_tagihan, tahun_tagihan')
+      ]);
+
+      const pemasukanData = pemasukanRes.data;
+      const pengeluaranData = pengeluaranRes.data;
+      const currentMonthBills = currentMonthBillsRes.data;
+      const trendData = trendDataRes.data;
 
       const totalPemasukan = (pemasukanData || []).reduce(
         (sum, row) => sum + (parseFloat(row.nominal_bayar) || 0),
         0
       );
-
-      // Fetch sum of Pengeluaran
-      const { data: pengeluaranData } = await supabaseAdmin
-        .from('transaksi')
-        .select('nominal_bayar')
-        .eq('jenis_transaksi', 'Pengeluaran');
 
       const totalPengeluaran = (pengeluaranData || []).reduce(
         (sum, row) => sum + (parseFloat(row.nominal_bayar) || 0),
@@ -206,14 +220,6 @@ export async function GET(request) {
       );
 
       const saldoKas = totalPemasukan - totalPengeluaran;
-
-      // Current month santri billing stats
-      const { data: currentMonthBills } = await supabaseAdmin
-        .from('transaksi')
-        .select('id, santri_id, status_bayar, santri(jenjang)')
-        .eq('jenis_transaksi', 'Pemasukan')
-        .eq('bulan_tagihan', currentMonth)
-        .eq('tahun_tagihan', currentYear);
 
       let totalCurrentBills = currentMonthBills?.length || 0;
       let lunasCount = 0;
@@ -259,10 +265,6 @@ export async function GET(request) {
         monthsTrend.push({ month: m, year: y, label: `${monthName} ${y}`, income: 0, expense: 0 });
       }
 
-      // Fetch all transactions in recent 3 months
-      const { data: trendData } = await supabaseAdmin
-        .from('transaksi')
-        .select('jenis_transaksi, nominal_bayar, tanggal_waktu, bulan_tagihan, tahun_tagihan');
 
       (trendData || []).forEach((row) => {
         const rowDate = new Date(row.tanggal_waktu);
