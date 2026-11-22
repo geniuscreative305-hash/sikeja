@@ -115,35 +115,29 @@ export async function GET(request) {
     // 1. PUBLIC STATS (Landing page without auth, strictly no financial leak)
     // ------------------------------------------------------------------------
     if (type === 'public_stats') {
-      const { count: totalSantri, error: e1 } = await supabaseAdmin
-        .from('santri')
-        .select('*', { count: 'exact', head: true })
-        .eq('status_aktif', true);
-
-      const { count: totalPutra, error: e2 } = await supabaseAdmin
-        .from('santri')
-        .select('*', { count: 'exact', head: true })
-        .eq('status_aktif', true)
-        .eq('gender', 'Putra');
-
-      const { count: totalPutri, error: e3 } = await supabaseAdmin
-        .from('santri')
-        .select('*', { count: 'exact', head: true })
-        .eq('status_aktif', true)
-        .eq('gender', 'Putri');
-
-      if (e1 || e2 || e3) {
-        return NextResponse.json({
-          total_santri: 8,
-          total_putra: 4,
-          total_putri: 4,
-        });
-      }
+      const [
+        { count: totalSantri },
+        { count: totalPutra },
+        { count: totalPutri },
+        settings
+      ] = await Promise.all([
+        supabaseAdmin.from('santri').select('*', { count: 'exact', head: true }).eq('status_aktif', true),
+        supabaseAdmin.from('santri').select('*', { count: 'exact', head: true }).eq('status_aktif', true).eq('gender', 'Putra'),
+        supabaseAdmin.from('santri').select('*', { count: 'exact', head: true }).eq('status_aktif', true).eq('gender', 'Putri'),
+        getSettingsMap(),
+      ]);
 
       return NextResponse.json({
-        total_santri: totalSantri || 8,
-        total_putra: totalPutra || 4,
-        total_putri: totalPutri || 4,
+        total_santri: totalSantri || 28,
+        total_putra: totalPutra || 27,
+        total_putri: totalPutri || 1,
+        settings: {
+          syahriah_putra: settings.syahriah_putra || 75000,
+          syahriah_putri: settings.syahriah_putri || 100000,
+          uang_makan: settings.uang_makan || 380000,
+          nama_pesantren: settings.nama_pesantren || 'Pondok Pesantren Babakan Jamanis',
+          alamat_pesantren: settings.alamat_pesantren || 'Jln. Cigugur KM 03 Pasirkiara Karangbenda Kec. Parigi Kab. Pangandaran Prov. Jawa Barat 46393',
+        }
       });
     }
 

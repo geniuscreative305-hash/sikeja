@@ -1,72 +1,38 @@
-# DRAFT RENCANA REVISI: Animated Statistics & Typing Text Effect di Hero Banner SIKEJA
+# DRAFT RENCANA REVISI: Multi-Section Landing Page SIKEJA (v2.7.0)
 ================================================================================
-STATUS: SELESAI DITERAPKAN & DIVERIFIKASI (v2.6 VERIFIED & DEPLOYED)
+STATUS: SELESAI DITERAPKAN & DIVERIFIKASI (v2.7 VERIFIED & DEPLOYED)
 ENGINE: ZettBOT Core v4.1 (by Zettbos)
-STANDAR: UI-UX-PRO-MAX (Micro-Interactions, Human-Crafted Aesthetic, Zero Dependency Jank)
+STANDAR: UI-UX-PRO-MAX (Dark-Emerald Glassmorphism, Responsive Multi-Section, Dynamic Settings)
 ================================================================================
 
 ## 1. Analisis Kebutuhan Pengguna
 
-Pengguna meminta 2 peningkatan estetika visual interaktif pada halaman depan (**Landing Page / Hero Section**):
-1. **Animated Counter (Perhitungan Angka dari 0 ke Target)** pada Panel Statistik Populasi Santri:
-   - Angka `Total Santri & Santriwati Aktif`, `Santri Putra`, dan `Santri Putri` tidak langsung muncul statis, melainkan berhitung naik secara halus (*smooth count-up animation*) dari 0 sampai ke angka riil database (misal: 0 → 28, 0 → 27, 0 → 1).
-2. **Typing Text Effect & Blinking Cursor** pada Headline Banner Hero:
-   - Teks headline mengetik karakter demi karakter secara otomatis memakai JavaScript murni, berhenti sejenak, menghapus (*backspace*), lalu berganti ke judul/fitur berikutnya secara berulang (*looping*).
-   - Dilengkapi kursor ketik berkedip (*blinking cursor* `|`) bergaya modern khas UI premium anti-AI.
+Memperbarui Landing Page SIKEJA dari satu layar (*single-fold*) menjadi halaman web penuh (*full multi-section web page*) yang dapat di-scroll ke bawah secara halus (*smooth scrolling*), tetap mempertahankan estetika **Dark-Emerald Glassmorphism**, dengan 4 seksi terpadu:
+1. **Smooth-Scroll Navbar**: Tautan navigasi di header (Beranda, Tarif & Syahriah, Keunggulan, Alur Bayar) + tombol "Masuk ke Sistem".
+2. **Seksi 1 (Tarif Bulanan)**: Kartu transparansi tarif bulanan Putra vs Putri (Syahriah + Uang Makan) yang datanya ditarik dinamis dari tabel `setting` di database.
+3. **Seksi 2 (4 Keunggulan Tata Kelola)**: Grid 4 kartu kaca keunggulan sistem (Tagihan Massal, Auto-Alokasi Multi-Pos, Kuitansi & WhatsApp, Laporan Resmi A4).
+4. **Seksi 3 (Alur Pembayaran 3 Langkah)**: Panduan 3 langkah bagi santri/wali santri (Terima Tagihan, Bayar Kasir/Transfer, Terima Kuitansi Sah). *Sesuai instruksi pengguna: Widget Cek NIS publik ditiadakan.*
+5. **Seksi 4 (Footer Resmi Pesantren)**: Nama pesantren, alamat, kontak dari tabel `setting`, tautan navigasi cepat, dan copyright SIKEJA.
 
 ---
 
-## 2. Rincian Teknis Rekayasa (Surgical Implementation)
+## 2. Berkas yang Dimodifikasi
 
-### A. Fitur 1: Animated Counter (CountUp via requestAnimationFrame)
-- **Komponen**: Dibuat komponen mini/hook `AnimatedCounter({ value, duration = 1200 })` di dalam `LandingPage.jsx`.
-- **Logika Animasi**:
-  - Menggunakan `requestAnimationFrame` dengan formula *Cubic Ease-Out* ($1 - (1 - t)^3$) agar pergerakan angka terasa natural (cepat di awal, melambat lembut saat mendekati target).
-  - Bekerja otomatis saat data stats selesai di-load dari API `/api/sikeja?type=public_stats` maupun saat initial snapshot.
-  - Ringan (0kb library eksternal), bebas re-render berlebih, dan 60fps mulus.
-- **Titik Penerapan**:
-  1. Box Utama: `Total Santri & Santriwati Aktif` (0 → target)
-  2. Box Kiri: `Santri Putra` (0 → target)
-  3. Box Kanan: `Santri Putri` (0 → target)
-
-### B. Fitur 2: Typing Text Effect & Blinking Cursor
-- **Komponen**: State mesin pengetik berbasis JavaScript murni (`typingIndex`, `charIndex`, `isDeleting`, `displayedText`).
-- **Daftar Kalimat Fitur yang Diketik Bergantian**:
-  Prefix tetap: `Akurat, Transparan, & Terpercaya untuk `
-  Frasa yang mengetik bergantian (highlight gradasi hijau-lime):
-  1. `"Kas Pesantren."`
-  2. `"Syahriah & Uang Makan."`
-  3. `"Pembukuan Real-time."`
-  4. `"Kuitansi & Laporan Cetak."`
-  5. `"Manajemen Data Santri."`
-- **Ritme Waktu (Timing)**:
-  - Kecepatan ketik: ~80ms per karakter.
-  - Jeda saat kalimat selesai diketik: ~2.000ms (2 detik waktu baca).
-  - Kecepatan hapus (backspace): ~40ms per karakter.
-  - Jeda sebelum mulai kata berikutnya: ~400ms.
-- **Kursor Berkedip**:
-  - Menggunakan elemen kursor vertikal beranimasi `inline-block w-[3px] h-[0.9em] ml-1.5 bg-lime-400 animate-pulse align-middle rounded-full` agar presisi dan elegan.
+1. `src/app/api/sikeja/route.js`:
+   - Pada handler `type === 'public_stats'`, menambahkan pengambilan data dari tabel `setting` via `Promise.all` (tarif syahriah putra/putri, tarif makan, nama pesantren, alamat, telepon) secara publik tanpa autentikasi.
+2. `src/components/LandingPage.jsx`:
+   - Menambahkan navbar links dengan smooth scroll (`onClick={() => scrollToSection('id')}` atau native `#id`).
+   - Menambahkan Seksi 1: Kartu Transparansi Tarif Bulanan (Putra vs Putri).
+   - Menambahkan Seksi 2: Grid 4 Keunggulan Tata Kelola Keuangan.
+   - Menambahkan Seksi 3: Alur Pembayaran 3 Langkah.
+   - Menambahkan Seksi 4: Footer resmi pesantren berestetika Dark-Emerald.
 
 ---
 
-## 3. Tabel Komparasi Sebelum vs Sesudah Revisi
+## 3. Desain & Estetika (Preservasi Dark-Emerald Glassmorphism)
 
-| No | Elemen UI | Kondisi Saat Ini (Sebelum) | Rencana Hasil (Sesudah) |
-| :--- | :--- | :--- | :--- |
-| 1 | **Panel Statistik** | Angka populasi santri muncul kaku & instan (statis 28, 27, 1) | **Efek Count-Up 60fps**: Angka menggelinding halus dari 0 ke target riil dalam 1,2 detik dengan *cubic easing*. |
-| 2 | **Headline Hero** | Teks `"Kas Pesantren."` diam dan statis | **Typing Text Effect**: Bergantian mengetik 5 variasi fitur otomatis dengan kursor ketik berkedip hijau lime. |
-| 3 | **Performa & Desain** | Ringan & elegan | **Tetap 100% ringan**, tanpa menambah package npm eksternal, desain dan warna asli tetap terjaga rapi. |
-
----
-
-## 4. Berkas yang Akan Diubah
-
-- `src/components/LandingPage.jsx` *(Surgical edit: hanya menambahkan state & hook animasi count-up dan typing effect, tanpa menyentuh layout, tombol, maupun fitur lainnya)*.
-
----
-
-## 5. Kriteria Verifikasi
-
-1. Buka landing page: angka total santri, putra, dan putri berhitung dari 0 ke angka aktual.
-2. Teks headline mengetik bergantian tanpa loncatan layout (*layout shift*).
-3. Build verifikasi: `npm run build` berhasil tanpa warning/error (exit code 0).
+- Latar belakang gradasi konsisten: `from-[#0b2239] via-[#0f3d3e] to-[#14533c]`.
+- Kartu menggunakan `glass-panel` dan `glass-panel-elevated` dengan border halus `border-white/10`.
+- Ikon vektor Lucide SVG yang serasi: `CheckCircle2`, `Wallet`, `Utensils`, `Layers`, `ShieldCheck`, `FileText`, `Send`, `CreditCard`, `Receipt`, `Building2`.
+- Format mata uang Rupiah otomatis menggunakan helper `Intl.NumberFormat('id-ID')`.
+- Mobile responsive: Grid 1 kolom di HP, 2-4 kolom di tablet & desktop.
