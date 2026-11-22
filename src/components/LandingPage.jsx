@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   ShieldCheck, 
   Users, 
@@ -12,13 +12,101 @@ import {
   Lock
 } from 'lucide-react';
 
+// Animated Number Component (Counts up smoothly from 0 to target)
+function AnimatedNumber({ value, duration = 1200 }) {
+  const [displayValue, setDisplayValue] = useState(0);
+  const targetVal = Number(value) || 0;
+  const currentValRef = useRef(0);
+
+  useEffect(() => {
+    let animId;
+    let startTimestamp = null;
+    const startVal = currentValRef.current;
+    const diff = targetVal - startVal;
+
+    if (diff === 0 && startVal === targetVal) {
+      return;
+    }
+
+    const step = (timestamp) => {
+      if (!startTimestamp) startTimestamp = timestamp;
+      const elapsed = timestamp - startTimestamp;
+      const progress = Math.min(elapsed / duration, 1);
+      
+      // Cubic ease-out curve
+      const easeOut = 1 - Math.pow(1 - progress, 3);
+      const current = Math.round(startVal + diff * easeOut);
+      
+      currentValRef.current = current;
+      setDisplayValue(current);
+
+      if (progress < 1) {
+        animId = requestAnimationFrame(step);
+      } else {
+        currentValRef.current = targetVal;
+        setDisplayValue(targetVal);
+      }
+    };
+
+    animId = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(animId);
+  }, [targetVal, duration]);
+
+  return <>{displayValue}</>;
+}
+
+const TYPING_PHRASES = [
+  'Kas Pesantren.',
+  'Syahriah & Uang Makan.',
+  'Pembukuan Real-time.',
+  'Kuitansi & Laporan Cetak.',
+  'Manajemen Santri Terpadu.',
+];
+
 export default function LandingPage({ onOpenLogin, onBrowseStats }) {
   // Pre-filled with reliable initial snapshot for zero-delay rendering
   const [stats, setStats] = useState({
-    total_santri: 8,
-    total_putra: 4,
-    total_putri: 4,
+    total_santri: 28,
+    total_putra: 27,
+    total_putri: 1,
   });
+
+  // Typing effect state
+  const [phraseIndex, setPhraseIndex] = useState(0);
+  const [currentText, setCurrentText] = useState(TYPING_PHRASES[0]);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  useEffect(() => {
+    const currentPhrase = TYPING_PHRASES[phraseIndex];
+    let timer;
+
+    if (!isDeleting) {
+      if (currentText.length < currentPhrase.length) {
+        timer = setTimeout(() => {
+          setCurrentText(currentPhrase.slice(0, currentText.length + 1));
+        }, 75);
+      } else {
+        // Pause at full text before deleting
+        timer = setTimeout(() => {
+          setIsDeleting(true);
+        }, 2200);
+      }
+    } else {
+      if (currentText.length > 0) {
+        timer = setTimeout(() => {
+          setCurrentText(currentPhrase.slice(0, currentText.length - 1));
+        }, 35);
+      } else {
+        // Pause briefly after deleting before starting next phrase
+        timer = setTimeout(() => {
+          setIsDeleting(false);
+          setPhraseIndex((prev) => (prev + 1) % TYPING_PHRASES.length);
+        }, 350);
+      }
+    }
+
+    return () => clearTimeout(timer);
+  }, [currentText, isDeleting, phraseIndex]);
 
   useEffect(() => {
     async function fetchPublicStats() {
@@ -81,8 +169,14 @@ export default function LandingPage({ onOpenLogin, onBrowseStats }) {
 
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white tracking-tight leading-[1.15]">
               Akurat, Transparan, & Terpercaya untuk{' '}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-300 to-lime-300">
-                Kas Pesantren.
+              <span className="inline-block">
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-300 to-lime-300">
+                  {currentText || '\u00A0'}
+                </span>
+                <span 
+                  className="inline-block w-[3px] h-[0.85em] ml-1.5 bg-lime-400 align-middle rounded-full animate-cursor-blink shadow-[0_0_8px_rgba(163,230,53,0.8)]"
+                  aria-hidden="true"
+                />
               </span>
             </h1>
 
@@ -157,7 +251,7 @@ export default function LandingPage({ onOpenLogin, onBrowseStats }) {
                   </span>
                   <div className="mt-2 flex items-baseline gap-3">
                     <span className="text-4xl sm:text-5xl font-extrabold text-white tabular-numbers">
-                      {stats.total_santri}
+                      <AnimatedNumber value={stats.total_santri} />
                     </span>
                     <span className="text-sm font-medium text-emerald-400">Santri Terdaftar</span>
                   </div>
@@ -172,7 +266,7 @@ export default function LandingPage({ onOpenLogin, onBrowseStats }) {
                       <span>Santri Putra</span>
                     </div>
                     <div className="text-2xl font-bold text-white tabular-numbers">
-                      {stats.total_putra}
+                      <AnimatedNumber value={stats.total_putra} />
                     </div>
                     <p className="text-[11px] text-slate-400 mt-1">SMP & MA Putra</p>
                   </div>
@@ -184,7 +278,7 @@ export default function LandingPage({ onOpenLogin, onBrowseStats }) {
                       <span>Santri Putri</span>
                     </div>
                     <div className="text-2xl font-bold text-white tabular-numbers">
-                      {stats.total_putri}
+                      <AnimatedNumber value={stats.total_putri} />
                     </div>
                     <p className="text-[11px] text-slate-400 mt-1">SMP & MA Putri</p>
                   </div>

@@ -106,6 +106,19 @@
   animation: pulseSubtle 2.5s infinite ease-in-out;
 }
 
+@keyframes cursorBlink {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+.animate-cursor-blink {
+  animation: cursorBlink 0.8s ease-in-out infinite;
+}
+
 /* Tabular Numbers for Accurate Alignment */
 .tabular-numbers {
   font-variant-numeric: tabular-nums;
