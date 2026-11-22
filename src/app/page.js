@@ -470,7 +470,7 @@ export default function AppRoot() {
       <ConfirmModal
         isOpen={isDeleteConfirmOpen}
         title="Konfirmasi Hapus Santri"
-        message={`Apakah Anda yakin ingin menghapus santri "${deletingSantri?.nama_lengkap}" (NIS: ${deletingSantri?.nis})? Tindakan ini tidak dapat dibatalkan.`}
+        message={`Apakah Anda yakin ingin menghapus santri "${deletingSantri?.nama_lengkap}" (NIS: ${deletingSantri?.nis})? Seluruh tagihan dan data keuangannya di menu Keuangan juga akan otomatis dihapus bersih.`}
         confirmText="Ya, Hapus Santri"
         cancelText="Batal"
         isDanger={true}

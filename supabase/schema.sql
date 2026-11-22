@@ -38,7 +38,7 @@ CREATE TABLE IF NOT EXISTS transaksi (
     kode_transaksi VARCHAR(40) UNIQUE NOT NULL,
     tanggal_waktu TIMESTAMPTZ DEFAULT NOW(),
     jenis_transaksi VARCHAR(20) CHECK (jenis_transaksi IN ('Pemasukan', 'Pengeluaran')) NOT NULL,
-    santri_id UUID REFERENCES santri(id) ON DELETE SET NULL,
+    santri_id UUID REFERENCES santri(id) ON DELETE CASCADE,
     bulan_tagihan INT CHECK (bulan_tagihan BETWEEN 1 AND 12),
     tahun_tagihan INT,
     nominal_tagihan NUMERIC(12,2) DEFAULT 0,

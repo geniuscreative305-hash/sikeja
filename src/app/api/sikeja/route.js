@@ -316,6 +316,13 @@ export async function GET(request) {
     // 5. TRANSACTIONS (Server-side Filtered & Paginated)
     // ------------------------------------------------------------------------
     if (type === 'transactions') {
+      // Bersihkan transaksi pemasukan yatim/bekas santri yang sudah dihapus
+      await supabaseAdmin
+        .from('transaksi')
+        .delete()
+        .eq('jenis_transaksi', 'Pemasukan')
+        .is('santri_id', null);
+
       const page = parseInt(searchParams.get('page') || '1', 10);
       const limit = parseInt(searchParams.get('limit') || '15', 10);
       const offset = (page - 1) * limit;
@@ -363,6 +370,9 @@ export async function GET(request) {
 
       if (jenis_transaksi) {
         query = query.eq('jenis_transaksi', jenis_transaksi);
+      }
+      if (jenis_transaksi === 'Pemasukan') {
+        query = query.not('santri_id', 'is', null);
       }
       if (status_bayar) {
         query = query.eq('status_bayar', status_bayar);
@@ -1203,7 +1213,7 @@ export async function POST(request) {
     }
 
     // ------------------------------------------------------------------------
-    // ACTION: DELETE_SANTRI
+    // ACTION: DELETE_SANTRI (Cascade Delete: Hapus Santri & Semua Tagihannya)
     // ------------------------------------------------------------------------
     if (action === 'delete_santri') {
       const { id } = body;
@@ -1211,14 +1221,32 @@ export async function POST(request) {
         return NextResponse.json({ error: 'ID Santri wajib disediakan.' }, { status: 400 });
       }
 
+      // 1. Hapus seluruh data transaksi & tagihan keuangan milik santri ini
+      const { error: trxErr } = await supabaseAdmin
+        .from('transaksi')
+        .delete()
+        .eq('santri_id', id);
+
+      if (trxErr) {
+        console.error('Error deleting student transactions:', trxErr);
+      }
+
+      // 2. Hapus data santri dari master biodata santri
       const { error } = await supabaseAdmin.from('santri').delete().eq('id', id);
       if (error) {
         return NextResponse.json({ error: error.message }, { status: 500 });
       }
 
+      // 3. Bersihkan sisa transaksi pemasukan yatim (orphaned) jika ada
+      await supabaseAdmin
+        .from('transaksi')
+        .delete()
+        .eq('jenis_transaksi', 'Pemasukan')
+        .is('santri_id', null);
+
       return NextResponse.json({
         success: true,
-        message: 'Data santri berhasil dihapus.',
+        message: 'Data santri beserta seluruh tagihan & catatan keuangannya berhasil dihapus bersih.',
       });
     }
 
