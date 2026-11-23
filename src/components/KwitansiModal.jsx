@@ -101,8 +101,8 @@ _Harap simpan pesan kwitansi ini sebagai bukti pembayaran yang sah. Diterbitkan 
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-md animate-fade-in overflow-y-auto">
-      <div className="w-full max-w-md my-auto flex flex-col items-center">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-md animate-fade-in overflow-y-auto print:static print:inset-auto print:p-0 print:m-0 print:bg-white print:backdrop-blur-none print:overflow-visible print:block print:h-auto print:min-h-0 print-modal-backdrop">
+      <div className="w-full max-w-md my-auto flex flex-col items-center print:max-w-none print:w-full print:block print:m-0">
         {/* Floating Action Bar (Hidden on print) */}
         <div className="w-full flex items-center justify-between gap-2 mb-3 no-print">
           <div className="flex items-center gap-2 flex-wrap">
@@ -175,7 +175,7 @@ _Harap simpan pesan kwitansi ini sebagai bukti pembayaran yang sah. Diterbitkan 
         )}
 
         {/* Printable Receipt Card (Thermal / A5 Style) */}
-        <div className="print-area w-full max-h-[85vh] overflow-y-auto p-6 sm:p-8 bg-white text-slate-900 rounded-xl shadow-2xl font-mono text-xs leading-relaxed border border-slate-200">
+        <div className="print-area print-receipt w-full max-h-[85vh] overflow-y-auto p-6 sm:p-8 bg-white text-slate-900 rounded-xl shadow-2xl font-mono text-xs leading-relaxed border border-slate-200 print:max-w-[140mm] print:mx-auto print:max-h-none print:overflow-visible print:p-6 print:border print:border-slate-300 print:shadow-none print:rounded-lg">
           {/* Header Institution */}
           <div className="text-center pb-4 border-b-2 border-dashed border-slate-300">
             {settings?.kop_surat_r2_url ? (

@@ -114,7 +114,7 @@ export default function IndividualReportModal({ isOpen, onClose, settings, initi
   const totalTunggakan = quarterRows.reduce((s, r) => s + r.sisaTunggakan, 0);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center p-3 sm:p-5 py-8 sm:py-12 bg-black/80 backdrop-blur-md animate-fade-in overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-start justify-center p-3 sm:p-5 py-8 sm:py-12 bg-black/80 backdrop-blur-md animate-fade-in overflow-y-auto print:static print:inset-auto print:p-0 print:m-0 print:bg-white print:backdrop-blur-none print:overflow-visible print:block print:h-auto print:min-h-0 print-modal-backdrop">
       {/* Floating Action Controls */}
       <div className="fixed top-4 right-4 z-50 flex items-center gap-3 no-print">
         <button
@@ -132,7 +132,7 @@ export default function IndividualReportModal({ isOpen, onClose, settings, initi
         </button>
       </div>
 
-      <div className="w-full max-w-4xl my-8">
+      <div className="w-full max-w-4xl my-8 print:my-0 print:max-w-none print:w-full">
         {/* Filter Controls (No print) */}
         <div className="glass-panel p-4 rounded-2xl mb-4 text-white flex flex-wrap items-center gap-4 no-print">
           <div className="flex-1 min-w-[220px]">
@@ -183,7 +183,7 @@ export default function IndividualReportModal({ isOpen, onClose, settings, initi
         </div>
 
         {/* Official Printable Paper Document (A4 format) */}
-        <div className="print-area bg-white text-slate-900 p-6 sm:p-12 rounded-xl shadow-2xl font-sans text-xs leading-normal border border-slate-200 overflow-x-auto">
+        <div className="print-area bg-white text-slate-900 p-6 sm:p-12 print:p-0 rounded-xl print:rounded-none shadow-2xl print:shadow-none font-sans text-xs leading-normal border border-slate-200 print:border-none overflow-x-auto print:overflow-visible">
           {/* Institutional Letterhead */}
           <div className="border-b-4 border-double border-slate-900 pb-4 mb-6">
             {settings?.kop_surat_r2_url ? (
@@ -263,8 +263,8 @@ export default function IndividualReportModal({ isOpen, onClose, settings, initi
               </div>
 
               {/* Breakdown Table */}
-              <div className="overflow-x-auto my-4">
-                <table className={`w-full border-collapse border border-slate-900 ${isYearMode ? 'text-[10px]' : 'text-[11px]'} min-w-[650px]`}>
+              <div className="overflow-x-auto my-4 print:overflow-visible">
+                <table className={`w-full border-collapse border border-slate-900 ${isYearMode ? 'text-[10px]' : 'text-[11px]'} min-w-[650px] print:min-w-0 print:text-[8.5pt] print-table`}>
                   <thead>
                     <tr className="bg-slate-100 text-slate-950 font-bold border-b border-slate-900">
                       <th className={`border border-slate-900 px-3 ${isYearMode ? 'py-1.5' : 'py-2'} text-left`}>Bulan Tagihan</th>

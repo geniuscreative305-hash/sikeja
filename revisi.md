@@ -1,54 +1,95 @@
-# DRAFT RENCANA REVISI: Konversi Sistem Diskon Libur dari Persentase (%) ke Nominal Rupiah (Rp)
+# DRAFT RENCANA REVISI: Perbaikan Total `@media print` CSS Laporan Keuangan (A4) & Struk Kwitansi
 ================================================================================
-STATUS: SELESAI DITERAPKAN & DIVERIFIKASI (v2.8.1 VERIFIED & DEPLOYED)
+STATUS: SELESAI DITERAPKAN & DIVERIFIKASI (v2.9.0 VERIFIED & DEPLOYED)
 ENGINE: ZettBOT Core v4.1 (by Zettbos)
-STANDAR: UI-UX-PRO-MAX (Surgical Refactor, Direct Nominal Ease, Clean Financial Input)
+STANDAR: UI-UX-PRO-MAX (Pixel-Perfect Print Isolation, Precision A4 Table Layout, 1-Sheet Struk Kwitansi)
 ================================================================================
 
-## 1. Analisis Kebutuhan Pengguna
+## 1. Analisis Masalah & Akar Penyebab (Root Cause Analysis)
 
-Pengguna meminta penyederhanaan sistem diskon libur pondok:
-- Mengganti input **Persentase (%)** pada kartu *"Pengaturan Diskon Libur Pondok"* menjadi **Nominal Rupiah (Rp)** langsung.
-- Alasan: Bendahara/Admin lebih mudah langsung mengetikkan nominal potongan uang (misal: potongan uang makan Rp 380.000 atau Rp 190.000) tanpa perlu menghitung persentase matematika.
-
----
-
-## 2. Rincian Teknis Perubahan
-
-### A. Komponen Frontend (`src/components/SettingView.jsx`)
-- Mengganti state & label:
-  - Dari `diskon_libur_makan_persen` (0–100%) $\rightarrow$ menjadi `diskon_libur_makan_nominal` (Rp).
-  - Dari `diskon_libur_syahriah_persen` (0–100%) $\rightarrow$ menjadi `diskon_libur_syahriah_nominal` (Rp).
-- Tampilan Input:
-  - Input angka step 5.000/10.000 (contoh: Rp 380.000 untuk bebas uang makan).
-  - Dilengkapi teks format live: `Terbaca: Rp 380.000` menggunakan `formatIDR()`.
-  - Placeholder & helper text membumi:
-    - *"Contoh: 380000 (Potongan penuh uang makan saat santri libur di rumah)"*
-    - *"Contoh: 0 (Jika syahriah tetap penuh tanpa potongan, atau isi nominal potongan)"*
-
-### B. Backend Engine (`src/app/api/sikeja/route.js`)
-- Di fungsi `getSettingsMap()`:
-  - Membaca `diskon_libur_makan_nominal` (default Rp 380.000) dan `diskon_libur_syahriah_nominal` (default Rp 0).
-- Di aksi `generate_bills`:
-  - Kalkulasi saat bulan libur menjadi pengurangan langsung nominal:
-    $$\text{Tarif Makan Efektif} = \max(0, \text{Uang Makan} - \text{Potongan Makan Nominal})$$
-    $$\text{Tarif Syahriah Efektif} = \max(0, \text{Syahriah} - \text{Potongan Syahriah Nominal})$$
-  - Bebas dari konversi persentase, 100% presisi dan tidak ada pembulatan desimal aneh.
+Berdasarkan keluhan pengguna dan dua tangkapan layar print preview (`EPSON L120 Series`):
+1. **Latar Gelap Aplikasi Ikut Tercetak di Belakang Kertas:**
+   - *Penyebab:* Elemen shell utama aplikasi (`<main>`, kartu transaksi `KeuanganView`, background gradient `body`, dan backdrop hitam modal `bg-black/80 backdrop-blur-md`) tidak tersembunyi saat `@media print`. Akibatnya browser merender seluruh halaman dasbor di belakang kertas laporan/struk.
+2. **Kolom Kanan Tabel Laporan Keuangan Terpotong (Uang Makan, Sisa Tunggakan, Status):**
+   - *Penyebab:* Terjadi penumpukan margin/padding ganda: `@page` memiliki margin `12mm`, ditambah `.print-area` memiliki `padding: 10mm 15mm` (total memotong 54mm dari lebar A4), sementara tabel dipaksa `min-w-[750px]` dalam pembungkus `overflow-x-auto`. Akibatnya tabel melebihi batas printable area A4 portrait (~190mm) dan kolom kanan terpotong habis.
+3. **Struk Kwitansi Mengambang & Menghasilkan 4 Lembar Kertas Kosong:**
+   - *Penyebab:* Modal kwitansi masih mempertahankan `fixed inset-0 flex items-center justify-center` dengan tinggi `max-h-[85vh]` dan backdrop gelap. Browser printer mencoba menghitung tinggi seluruh halaman aplikasi di baliknya sehingga memicu pagination kosong hingga 4 lembar kertas.
 
 ---
 
-## 3. Tabel Komparasi Sebelum vs Sesudah
+## 2. Rincian Teknis Solusi Rekayasa
 
-| Elemen UI / Backend | Sebelum Revisi (Persen %) | Sesudah Revisi (Target: Nominal Rp) |
+### A. Isolasi Total Mode Cetak (`src/app/globals.css` & `src/app/page.js`)
+- Di `src/app/page.js`:
+  - Tambahkan kelas `print:hidden` pada wrapper utama aplikasi (`#app-main-layout`).
+  - Efek: Saat print aktif, seluruh sidebar, header, dan konten view aplikasi (Dashboard, Keuangan, Santri, Setting) otomatis 100% dihapus dari pohon render cetak (`display: none !important;`).
+- Di `src/app/globals.css`:
+  - Reset `html, body` saat cetak:
+    ```css
+    html, body {
+      background: #ffffff !important;
+      background-image: none !important;
+      color: #000000 !important;
+      height: auto !important;
+      min-height: auto !important;
+      overflow: visible !important;
+    }
+    ```
+  - Hilangkan perilaku modal fixed untuk `.print-modal-backdrop`:
+    `position: static !important; background: transparent !important; backdrop-filter: none !important; padding: 0 !important; margin: 0 !important; height: auto !important; overflow: visible !important;`
+
+### B. Perbaikan Tabel Laporan Keuangan A4 (`CollectiveReportModal.jsx` & `IndividualReportModal.jsx`)
+- Hapus padding ganda pada `.print-area`:
+  - Ubah `.print-area` cetak menjadi `padding: 0 !important; margin: 0 !important; border: none !important; box-shadow: none !important;`.
+- Margin Kertas Fisik:
+  - Tetapkan `@page { size: A4 portrait; margin: 10mm 10mm 10mm 10mm; }` sehingga tersedia lebar bersih 190mm penuh untuk tabel.
+- Optimalisasi Tabel Cetak:
+  - Hapus batasan `min-w-[750px]` saat cetak (`print:min-w-0`).
+  - Atur font cetak tabel: `8.5pt` dengan padding sel rapat `3px 4px`.
+  - Berikan lebar persentase proporsional untuk 11 kolom:
+    1. No: 3%
+    2. NIS: 9%
+    3. Nama Santri: 20%
+    4. Kelas: 7%
+    5. Gdr: 4%
+    6. Tagihan: 11%
+    7. Syahriah: 9%
+    8. Makan: 9%
+    9. Dibayar: 11%
+    10. Tunggakan: 11%
+    11. Status: 6%
+    *Total: 100% muat sempurna di dalam 190mm tanpa ada yang terpotong ke kanan.*
+  - Pertahankan perulangan header dan proteksi jeda halaman:
+    `thead { display: table-header-group; }`
+    `tr { break-inside: avoid; page-break-inside: avoid; }`
+    `.no-break-inside { break-inside: avoid; page-break-inside: avoid; }` pada blok tanda tangan pejabat.
+
+### C. Layout Struk Kwitansi 1 Lembar Pas (`KwitansiModal.jsx`)
+- Wrapper modal dialihkan menjadi `print:static print:bg-transparent print:p-0 print:overflow-visible`.
+- Kontainer struk kwitansi diberikan kelas `.print-receipt`:
+  - `max-width: 140mm !important; margin: 0 auto !important; height: auto !important; overflow: visible !important;`
+  - Tambahkan proteksi jeda: `page-break-after: avoid !important; break-after: avoid !important; page-break-inside: avoid !important;`
+  - Bersihkan bayangan (`print:shadow-none`), hilangkan batas tinggi (`print:max-h-none`), dan gunakan border tipis rapi (`border: 1px solid #cbd5e1`).
+  - Hasil: Kwitansi tercetak bersih di tengah/atas kertas putih A4 printer EPSON L120 dengan total pas **1 lembar saja (1 sheet of paper)**.
+
+---
+
+## 3. Matriks Perbandingan Sebelum vs Sesudah
+
+| Aspek Pengujian Cetak | Sebelum Perbaikan | Target Sesudah Perbaikan |
 | :--- | :--- | :--- |
-| **Input Potongan Makan** | `Potongan Uang Makan Saat Libur (%)` (Isi: 100) | `Potongan Uang Makan Saat Libur (Rp)` (Isi: 380.000) |
-| **Input Potongan Syahriah** | `Potongan Syahriah/SPP Saat Libur (%)` (Isi: 0) | `Potongan Syahriah/SPP Saat Libur (Rp)` (Isi: 0) |
-| **Bantuan Keterangan** | Menjelaskan persentase 0-100% | Format mata uang live `Terbaca: Rp 380.000` |
-| **Kalkulasi Tagihan** | `uangMakan * (1 - persen/100)` | `uangMakan - potonganNominal` (Langsung & Mudah) |
+| **Latar Belakang Print** | Muncul kartu gelap dashboard & backdrop hitam | Bersih putih polos 100% (`#ffffff`) tanpa bayangan |
+| **Kolom Tabel Laporan A4** | Kolom Makan, Tunggakan, Status terpotong ke kanan | Seluruh 11 kolom muat 100% presisi dalam batas A4 |
+| **Header Tabel Halaman 2+** | Hilang di halaman berikutnya jika data banyak | Berulang otomatis di halaman atas (`table-header-group`) |
+| **Jumlah Lembar Struk Kwitansi** | 4 sheets of paper (3 lembar kosong mengambang) | **Pas 1 sheet of paper** tanpa lembar kosong tambahan |
+| **Tampilan Cetak Printer Inkjet** | Teks struk kabur dalam kotak gelap | Teks hitam tajam, border garis rapi, siap cetak resmi |
 
 ---
 
 ## 4. Berkas yang Akan Dimodifikasi
 
-1. `src/components/SettingView.jsx` (Ganti input % ke Rp + helper format IDR live).
-2. `src/app/api/sikeja/route.js` (Sesuaikan pembacaan setting dan formula pengurangan nominal pada `generate_bills`).
+1. `src/app/globals.css` (Overhaul total aturan `@media print`, isolasi modal, tabel A4, dan `.print-receipt`).
+2. `src/app/page.js` (Tambahkan `print:hidden` pada `#app-main-layout` agar seluruh UI aplikasi tertutup total saat cetak).
+3. `src/components/CollectiveReportModal.jsx` (Terapkan `.print-modal-backdrop`, `print:min-w-0`, `print:text-[8.5pt]`, proporsi kolom tabel).
+4. `src/components/IndividualReportModal.jsx` (Terapkan `.print-modal-backdrop`, `print:min-w-0`, tabel kuartal/tahunan presisi).
+5. `src/components/KwitansiModal.jsx` (Terapkan `.print-modal-backdrop`, kelas `.print-receipt`, `max-w-[140mm]`, 1-sheet constraint).

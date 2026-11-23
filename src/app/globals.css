@@ -128,10 +128,31 @@
    STRICT @media print RULES (A4 Official Documents & Receipts)
    ========================================================================== */
 @media print {
-  /* Hide all interactive app elements */
+  /* Reset document root to clean, crisp white paper */
+  html,
+  body {
+    background: #ffffff !important;
+    background-image: none !important;
+    color: #000000 !important;
+    font-size: 10pt !important;
+    line-height: 1.35 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: auto !important;
+    overflow: visible !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Completely hide all interactive and application shell elements */
+  #app-main-layout,
   nav,
   aside,
   header,
+  main,
+  footer,
   .no-print,
   .sidebar,
   button,
@@ -141,64 +162,100 @@
     display: none !important;
   }
 
-  /* Reset document root to clean, crisp white paper */
-  html,
-  body {
-    background: #ffffff !important;
-    color: #000000 !important;
-    font-size: 11pt !important;
-    line-height: 1.4 !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    -webkit-print-color-adjust: exact !important;
-    print-color-adjust: exact !important;
-  }
-
-  /* Make sure printed containers take 100% width without overflow */
-  .print-area {
+  /* Modal backdrop reset: un-fix and flatten for print */
+  .print-modal-backdrop {
+    position: static !important;
     display: block !important;
-    position: relative !important;
-    width: 100% !important;
+    background: transparent !important;
+    background-color: transparent !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    padding: 0 !important;
     margin: 0 !important;
-    padding: 10mm 15mm !important;
-    background: #ffffff !important;
-    color: #000000 !important;
-    border: none !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: visible !important;
     box-shadow: none !important;
   }
 
-  .print-area table {
+  /* Printable container takes full width, no double margin/padding */
+  .print-area {
+    display: block !important;
+    position: static !important;
     width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #ffffff !important;
+    background-color: #ffffff !important;
+    color: #000000 !important;
+    border: none !important;
+    box-shadow: none !important;
+    overflow: visible !important;
+  }
+
+  /* Table styling for A4 Financial Reports */
+  .print-table {
+    width: 100% !important;
+    min-width: 0 !important;
+    table-layout: auto !important;
     border-collapse: collapse !important;
     color: #000000 !important;
   }
 
-  .print-area th,
-  .print-area td {
+  .print-table th,
+  .print-table td {
     border: 1px solid #111111 !important;
-    padding: 6px 8px !important;
+    padding: 3px 4px !important;
     color: #000000 !important;
-    font-size: 10pt !important;
+    font-size: 8.5pt !important;
+    line-height: 1.25 !important;
   }
 
-  .print-area th {
+  .print-table th {
     background-color: #f1f5f9 !important;
     font-weight: 700 !important;
   }
 
-  @page {
-    size: A4 portrait;
-    margin: 12mm;
+  /* Struk Kwitansi Single-Sheet styling */
+  .print-receipt {
+    max-width: 140mm !important;
+    margin: 0 auto !important;
+    padding: 6mm 8mm !important;
+    border: 1px solid #cbd5e1 !important;
+    border-radius: 8px !important;
+    box-shadow: none !important;
+    page-break-after: avoid !important;
+    break-after: avoid !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
   }
 
-  /* Force page breaks cleanly if multi-page */
+  @page {
+    size: A4 portrait;
+    margin: 10mm;
+  }
+
+  thead {
+    display: table-header-group !important;
+  }
+
+  tr {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+
   .page-break-after {
     page-break-after: always;
   }
 
   .no-break-inside {
-    break-inside: avoid;
-    page-break-inside: avoid;
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
   }
 }
 

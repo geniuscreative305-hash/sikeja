@@ -270,7 +270,7 @@ export default function AppRoot() {
 
   // Authenticated Application Shell
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0b2239] via-[#0f3d3e] to-[#14533c] text-white flex overflow-x-hidden w-full">
+    <div id="app-main-layout" className="min-h-screen bg-gradient-to-br from-[#0b2239] via-[#0f3d3e] to-[#14533c] text-white flex overflow-x-hidden w-full print:hidden">
       {/* Sidebar Navigation */}
       <Sidebar
         activeTab={activeTab}

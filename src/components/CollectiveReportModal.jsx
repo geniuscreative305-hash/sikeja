@@ -56,7 +56,7 @@ export default function CollectiveReportModal({ isOpen, onClose, settings }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center p-3 sm:p-5 py-8 sm:py-12 bg-black/80 backdrop-blur-md animate-fade-in overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-start justify-center p-3 sm:p-5 py-8 sm:py-12 bg-black/80 backdrop-blur-md animate-fade-in overflow-y-auto print:static print:inset-auto print:p-0 print:m-0 print:bg-white print:backdrop-blur-none print:overflow-visible print:block print:h-auto print:min-h-0 print-modal-backdrop">
       {/* Floating Action Controls (Hidden when printing) */}
       <div className="fixed top-4 right-4 z-50 flex items-center gap-3 no-print">
         <button
@@ -75,7 +75,7 @@ export default function CollectiveReportModal({ isOpen, onClose, settings }) {
       </div>
 
       {/* Main Document Container */}
-      <div className="w-full max-w-5xl my-8">
+      <div className="w-full max-w-5xl my-8 print:my-0 print:max-w-none print:w-full">
         {/* Filter Controls (Hidden when printing) */}
         <div className="glass-panel p-4 rounded-2xl mb-4 text-white flex flex-wrap items-center gap-2.5 no-print">
           <div className="flex items-center gap-1.5 text-xs font-semibold text-emerald-400">
@@ -142,7 +142,7 @@ export default function CollectiveReportModal({ isOpen, onClose, settings }) {
         </div>
 
         {/* Official Printable Paper Document (A4 format) */}
-        <div className="print-area bg-white text-slate-900 p-6 sm:p-12 rounded-xl shadow-2xl font-sans text-xs leading-normal border border-slate-200 overflow-x-auto">
+        <div className="print-area bg-white text-slate-900 p-6 sm:p-12 print:p-0 rounded-xl print:rounded-none shadow-2xl print:shadow-none font-sans text-xs leading-normal border border-slate-200 print:border-none overflow-x-auto print:overflow-visible">
           {/* Institutional Letterhead (KOP SURAT) */}
           <div className="border-b-4 border-double border-slate-900 pb-4 mb-6">
             {settings?.kop_surat_r2_url ? (
@@ -194,37 +194,37 @@ export default function CollectiveReportModal({ isOpen, onClose, settings }) {
             </div>
           ) : (
             <>
-              <div className="overflow-x-auto my-4">
-                <table className="w-full border-collapse border border-slate-900 text-[11px] min-w-[750px]">
+              <div className="overflow-x-auto my-4 print:overflow-visible">
+                <table className="w-full border-collapse border border-slate-900 text-[11px] min-w-[750px] print:min-w-0 print:text-[8.5pt] print-table">
                   <thead>
                     <tr className="bg-slate-100 text-slate-950 font-bold border-b border-slate-900">
-                      <th className="border border-slate-900 px-2 py-2 text-center w-8">No</th>
-                      <th className="border border-slate-900 px-2 py-2 text-left">NIS</th>
-                      <th className="border border-slate-900 px-2 py-2 text-left">Nama Santri</th>
-                      <th className="border border-slate-900 px-2 py-2 text-center">Kelas</th>
-                      <th className="border border-slate-900 px-2 py-2 text-center">Gdr</th>
-                      <th className="border border-slate-900 px-2 py-2 text-right">Tagihan</th>
-                      <th className="border border-slate-900 px-2 py-2 text-right">Syahriah</th>
-                      <th className="border border-slate-900 px-2 py-2 text-right">Makan</th>
-                      <th className="border border-slate-900 px-2 py-2 text-right">Dibayar</th>
-                      <th className="border border-slate-900 px-2 py-2 text-right">Tunggakan</th>
-                      <th className="border border-slate-900 px-2 py-2 text-center">Status</th>
+                      <th className="border border-slate-900 px-2 py-2 print:px-1 print:py-1 text-center w-[3%]">No</th>
+                      <th className="border border-slate-900 px-2 py-2 print:px-1 print:py-1 text-left w-[9%]">NIS</th>
+                      <th className="border border-slate-900 px-2 py-2 print:px-1 print:py-1 text-left w-[20%]">Nama Santri</th>
+                      <th className="border border-slate-900 px-2 py-2 print:px-1 print:py-1 text-center w-[7%]">Kelas</th>
+                      <th className="border border-slate-900 px-2 py-2 print:px-1 print:py-1 text-center w-[4%]">Gdr</th>
+                      <th className="border border-slate-900 px-2 py-2 print:px-1 print:py-1 text-right w-[11%]">Tagihan</th>
+                      <th className="border border-slate-900 px-2 py-2 print:px-1 print:py-1 text-right w-[9%]">Syahriah</th>
+                      <th className="border border-slate-900 px-2 py-2 print:px-1 print:py-1 text-right w-[9%]">Makan</th>
+                      <th className="border border-slate-900 px-2 py-2 print:px-1 print:py-1 text-right w-[11%]">Dibayar</th>
+                      <th className="border border-slate-900 px-2 py-2 print:px-1 print:py-1 text-right w-[11%]">Tunggakan</th>
+                      <th className="border border-slate-900 px-2 py-2 print:px-1 print:py-1 text-center w-[6%]">Status</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-300">
                     {records.map((r, idx) => (
                       <tr key={r.id} className="hover:bg-slate-50 tabular-numbers">
-                        <td className="border border-slate-400 px-2 py-1.5 text-center">{idx + 1}</td>
-                        <td className="border border-slate-400 px-2 py-1.5 font-mono text-[10px]">{r.santri?.nis || '-'}</td>
-                        <td className="border border-slate-400 px-2 py-1.5 font-medium text-slate-950">{r.santri?.nama_lengkap || '-'}</td>
-                        <td className="border border-slate-400 px-2 py-1.5 text-center">{r.santri ? `${r.santri.jenjang || ''}-${r.santri.kelas || ''}` : '-'}</td>
-                        <td className="border border-slate-400 px-2 py-1.5 text-center">{r.santri?.gender === 'Putra' ? 'L' : 'P'}</td>
-                        <td className="border border-slate-400 px-2 py-1.5 text-right font-medium">{formatIDR(r.nominal_tagihan)}</td>
-                        <td className="border border-slate-400 px-2 py-1.5 text-right">{formatIDR(r.alokasi_syahriah)}</td>
-                        <td className="border border-slate-400 px-2 py-1.5 text-right">{formatIDR(r.alokasi_makan)}</td>
-                        <td className="border border-slate-400 px-2 py-1.5 text-right font-bold text-slate-950">{formatIDR(r.nominal_bayar)}</td>
-                        <td className="border border-slate-400 px-2 py-1.5 text-right font-semibold text-red-700">{formatIDR(r.sisa_tunggakan)}</td>
-                        <td className="border border-slate-400 px-2 py-1.5 text-center font-bold uppercase text-[10px]">
+                        <td className="border border-slate-400 px-2 py-1.5 print:px-1 print:py-1 text-center">{idx + 1}</td>
+                        <td className="border border-slate-400 px-2 py-1.5 print:px-1 print:py-1 font-mono text-[10px] print:text-[8pt]">{r.santri?.nis || '-'}</td>
+                        <td className="border border-slate-400 px-2 py-1.5 print:px-1 print:py-1 font-medium text-slate-950">{r.santri?.nama_lengkap || '-'}</td>
+                        <td className="border border-slate-400 px-2 py-1.5 print:px-1 print:py-1 text-center">{r.santri ? `${r.santri.jenjang || ''}-${r.santri.kelas || ''}` : '-'}</td>
+                        <td className="border border-slate-400 px-2 py-1.5 print:px-1 print:py-1 text-center">{r.santri?.gender === 'Putra' ? 'L' : 'P'}</td>
+                        <td className="border border-slate-400 px-2 py-1.5 print:px-1 print:py-1 text-right font-medium">{formatIDR(r.nominal_tagihan)}</td>
+                        <td className="border border-slate-400 px-2 py-1.5 print:px-1 print:py-1 text-right">{formatIDR(r.alokasi_syahriah)}</td>
+                        <td className="border border-slate-400 px-2 py-1.5 print:px-1 print:py-1 text-right">{formatIDR(r.alokasi_makan)}</td>
+                        <td className="border border-slate-400 px-2 py-1.5 print:px-1 print:py-1 text-right font-bold text-slate-950">{formatIDR(r.nominal_bayar)}</td>
+                        <td className="border border-slate-400 px-2 py-1.5 print:px-1 print:py-1 text-right font-semibold text-red-700">{formatIDR(r.sisa_tunggakan)}</td>
+                        <td className="border border-slate-400 px-2 py-1.5 print:px-1 print:py-1 text-center font-bold uppercase text-[10px] print:text-[8pt]">
                           {r.status_bayar}
                         </td>
                       </tr>
@@ -232,11 +232,11 @@ export default function CollectiveReportModal({ isOpen, onClose, settings }) {
                   </tbody>
                   <tfoot>
                     <tr className="bg-slate-100 font-extrabold text-slate-950 border-t-2 border-slate-900 tabular-numbers">
-                      <td colSpan={5} className="border border-slate-900 px-3 py-2 text-right">TOTAL KESELURUHAN</td>
-                      <td className="border border-slate-900 px-2 py-2 text-right">{formatIDR(totalTagihan)}</td>
+                      <td colSpan={5} className="border border-slate-900 px-3 py-2 print:px-1 print:py-1 text-right">TOTAL KESELURUHAN</td>
+                      <td className="border border-slate-900 px-2 py-2 print:px-1 print:py-1 text-right">{formatIDR(totalTagihan)}</td>
                       <td colSpan={2} className="border border-slate-900"></td>
-                      <td className="border border-slate-900 px-2 py-2 text-right text-emerald-800">{formatIDR(totalBayar)}</td>
-                      <td className="border border-slate-900 px-2 py-2 text-right text-red-800">{formatIDR(totalTunggakan)}</td>
+                      <td className="border border-slate-900 px-2 py-2 print:px-1 print:py-1 text-right text-emerald-800">{formatIDR(totalBayar)}</td>
+                      <td className="border border-slate-900 px-2 py-2 print:px-1 print:py-1 text-right text-red-800">{formatIDR(totalTunggakan)}</td>
                       <td className="border border-slate-900"></td>
                     </tr>
                   </tfoot>
