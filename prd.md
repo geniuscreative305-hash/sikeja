@@ -72,7 +72,7 @@ Pengelolaan administrasi keuangan pesantren konvensional (syahriah bulanan, uang
 ================================================================================
 ZONA BAWAH: MASTER CONTEXT & LOGIKA SISTEM TERKINI (LIVING CONTEXT)
 ================================================================================
-- Versi Rilis: v2.9.0 (Pixel-Perfect Print Isolation & 1-Sheet Kwitansi Edition)
+- Versi Rilis: v2.9.1 (Precise Scope Print Isolation & Zero-Blank Hotfix Edition)
 - Stack Aktif: Next.js 14 App Router, Supabase PostgreSQL, Tailwind CSS 3.4, SheetJS (xlsx).
 - RBAC Enforcement: 
   * Login Publik: Hanya menyediakan tombol demo untuk Tamu (Guest / Read-Only).
@@ -96,4 +96,5 @@ ZONA BAWAH: MASTER CONTEXT & LOGIKA SISTEM TERKINI (LIVING CONTEXT)
   * [Revisi v2.8]: Print Modal Top-Clipping Fix (items-start py-8), Widget Arus Kas Putra vs Putri di Dashboard dengan peruntukan pos pengeluaran, Sistem Diskon Libur Pondok & Diskon Beasiswa Santri (Prestasi & Afirmasi - Full/Parsial terintegrasi otomatis ke generator tagihan), dan Akselerasi Animasi Hero Landing Page 0-Delay.
   * [Revisi v2.8.1]: Konversi Sistem Diskon Libur Pondok ke Nominal Rupiah (Rp) langsung untuk potongan uang makan dan syahriah, dilengkapi format mata uang live agar bendahara tidak perlu menghitung persentase.
   * [Revisi v2.9.0]: Perbaikan Total `@media print` CSS Laporan Keuangan (A4) & Struk Kwitansi (Isolasi total shell aplikasi via `print:hidden` & reset modal backdrop menghilangkan latar gelap dan backdrop hitam; penataan ulang tabel A4 kolektif/individual dengan font 8.5pt, compact padding 3px 4px, dan proporsi 11 kolom pas 100% tanpa terpotong; serta layout struk kwitansi single-sheet `.print-receipt` pas 1 lembar kertas A4 tanpa lembar kosong tambahan).
+  * [Revisi v2.9.1]: Hotfix Scope Isolasi Cetak (Koreksi penempatan `print:hidden` dari root terluar ke pembungkus konten utama dasbor baris 287 sehingga komponen modal tetap ter-mount sempurna dan mengatasi masalah halaman cetak blank putih; serta penonaktifan animasi CSS pada `@media print`).
 

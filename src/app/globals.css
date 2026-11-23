@@ -128,6 +128,14 @@
    STRICT @media print RULES (A4 Official Documents & Receipts)
    ========================================================================== */
 @media print {
+  /* Disable animations and transitions so nothing is stuck at opacity:0 */
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+
   /* Reset document root to clean, crisp white paper */
   html,
   body {
@@ -147,7 +155,6 @@
   }
 
   /* Completely hide all interactive and application shell elements */
-  #app-main-layout,
   nav,
   aside,
   header,

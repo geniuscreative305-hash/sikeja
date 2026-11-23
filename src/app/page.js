@@ -270,7 +270,7 @@ export default function AppRoot() {
 
   // Authenticated Application Shell
   return (
-    <div id="app-main-layout" className="min-h-screen bg-gradient-to-br from-[#0b2239] via-[#0f3d3e] to-[#14533c] text-white flex overflow-x-hidden w-full print:hidden">
+    <div className="min-h-screen bg-gradient-to-br from-[#0b2239] via-[#0f3d3e] to-[#14533c] text-white flex overflow-x-hidden w-full print:bg-white print:text-black print:min-h-0 print:h-auto print:block">
       {/* Sidebar Navigation */}
       <Sidebar
         activeTab={activeTab}
@@ -283,9 +283,9 @@ export default function AppRoot() {
         setIsMobileOpen={setIsMobileOpen}
       />
 
-      {/* Main Content Area */}
+      {/* Main Content Area (Hidden during print so only printable modal shows) */}
       <div
-        className={`flex-1 flex flex-col min-h-screen min-w-0 transition-all duration-300 w-full ${isCollapsed ? 'lg:pl-20' : 'lg:pl-64'
+        className={`flex-1 flex flex-col min-h-screen min-w-0 transition-all duration-300 w-full print:hidden ${isCollapsed ? 'lg:pl-20' : 'lg:pl-64'
           }`}
       >
         {/* Top Header Bar */}
