@@ -102,6 +102,33 @@ _Harap simpan pesan kwitansi ini sebagai bukti pembayaran yang sah. Diterbitkan 
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-md animate-fade-in overflow-y-auto print:static print:inset-auto print:p-0 print:m-0 print:bg-white print:backdrop-blur-none print:overflow-visible print:block print:h-auto print:min-h-0 print-modal-backdrop">
+      {/* Dedicated Print Style for Standard A5 Receipt */}
+      <style jsx global>{`
+        @media print {
+          @page {
+            size: A5 portrait !important;
+            margin: 6mm 8mm !important;
+          }
+          .print-receipt-a5 {
+            width: 100% !important;
+            max-width: 100% !important;
+            margin: 0 auto !important;
+            padding: 4mm 6mm !important;
+            border: 1px solid #475569 !important;
+            border-radius: 6px !important;
+            background: #ffffff !important;
+            color: #000000 !important;
+            page-break-after: avoid !important;
+            break-after: avoid !important;
+            page-break-inside: avoid !important;
+            break-inside: avoid !important;
+            height: auto !important;
+            max-height: none !important;
+            overflow: visible !important;
+          }
+        }
+      `}</style>
+
       <div className="w-full max-w-md my-auto flex flex-col items-center print:max-w-none print:w-full print:block print:m-0">
         {/* Floating Action Bar (Hidden on print) */}
         <div className="w-full flex items-center justify-between gap-2 mb-3 no-print">
@@ -175,29 +202,29 @@ _Harap simpan pesan kwitansi ini sebagai bukti pembayaran yang sah. Diterbitkan 
         )}
 
         {/* Printable Receipt Card (Thermal / A5 Style) */}
-        <div className="print-area print-receipt w-full max-h-[85vh] overflow-y-auto p-6 sm:p-8 bg-white text-slate-900 rounded-xl shadow-2xl font-mono text-xs leading-relaxed border border-slate-200 print:max-w-[140mm] print:mx-auto print:max-h-none print:overflow-visible print:p-6 print:border print:border-slate-300 print:shadow-none print:rounded-lg">
+        <div className="print-area print-receipt print-receipt-a5 w-full max-h-[85vh] overflow-y-auto p-6 sm:p-8 print:p-4 bg-white text-slate-900 rounded-xl shadow-2xl font-mono text-xs leading-relaxed border border-slate-200 print:max-w-none print:w-full print:mx-auto print:max-h-none print:overflow-visible print:border print:border-slate-400 print:shadow-none print:rounded-lg">
           {/* Header Institution */}
-          <div className="text-center pb-4 border-b-2 border-dashed border-slate-300">
+          <div className="text-center pb-4 print:pb-2 border-b-2 border-dashed border-slate-300">
             {settings?.kop_surat_r2_url ? (
               <img
                 src={settings.kop_surat_r2_url}
                 alt="Kop Pesantren"
-                className="max-h-16 mx-auto mb-2 object-contain"
+                className="max-h-16 print:max-h-11 mx-auto mb-2 print:mb-1 object-contain"
               />
             ) : null}
-            <h2 className="text-base font-bold uppercase tracking-tight text-slate-900 font-sans">
+            <h2 className="text-base print:text-sm font-bold uppercase tracking-tight text-slate-900 font-sans">
               {settings?.nama_pesantren || 'Pondok Pesantren Babakan Jamanis'}
             </h2>
-            <p className="text-[10px] text-slate-600 font-sans">
+            <p className="text-[10px] print:text-[8.5pt] text-slate-600 font-sans">
               {settings?.alamat_pesantren || 'Jln. Cigugur KM 03 Pasirkiara Karangbenda Kec. Parigi Kab. Pangandaran Prov. Jawa Barat 46393'}
             </p>
-            <div className="mt-2 inline-block px-3 py-1 bg-slate-100 rounded text-[11px] font-bold tracking-widest text-slate-800 font-sans">
+            <div className="mt-2 print:mt-1 inline-block px-3 py-1 print:py-0.5 bg-slate-100 rounded text-[11px] print:text-[9pt] font-bold tracking-widest text-slate-800 font-sans">
               BUKTI PEMBAYARAN SANTRI (KWITANSI)
             </div>
           </div>
 
           {/* Transaction Meta */}
-          <div className="py-3 border-b border-dashed border-slate-300 space-y-1 text-[11px]">
+          <div className="py-3 print:py-1.5 border-b border-dashed border-slate-300 space-y-1 print:space-y-0.5 text-[11px] print:text-[9pt]">
             <div className="flex justify-between">
               <span className="text-slate-500">No. Kwitansi:</span>
               <span className="font-bold text-slate-900">{transaction.kode_transaksi}</span>
@@ -217,7 +244,7 @@ _Harap simpan pesan kwitansi ini sebagai bukti pembayaran yang sah. Diterbitkan 
           </div>
 
           {/* Student Details */}
-          <div className="py-3 border-b border-dashed border-slate-300 space-y-1 text-[11px]">
+          <div className="py-3 print:py-1.5 border-b border-dashed border-slate-300 space-y-1 print:space-y-0.5 text-[11px] print:text-[9pt]">
             <div className="flex justify-between">
               <span className="text-slate-500">NIS Santri:</span>
               <span className="font-semibold text-slate-900">{transaction.santri?.nis || '-'}</span>
@@ -235,7 +262,7 @@ _Harap simpan pesan kwitansi ini sebagai bukti pembayaran yang sah. Diterbitkan 
               <span className="font-semibold text-slate-900">{billingMonthName} {transaction.tahun_tagihan}</span>
             </div>
             {transaction.santri?.no_hp && (
-              <div className="flex justify-between text-[10px] text-emerald-700">
+              <div className="flex justify-between text-[10px] print:text-[8pt] text-emerald-700">
                 <span>WhatsApp Wali:</span>
                 <span className="font-semibold">{transaction.santri.no_hp}</span>
               </div>
@@ -243,7 +270,7 @@ _Harap simpan pesan kwitansi ini sebagai bukti pembayaran yang sah. Diterbitkan 
           </div>
 
           {/* Breakdown Items */}
-          <div className="py-3 border-b-2 border-dashed border-slate-300 space-y-2 text-[11px]">
+          <div className="py-3 print:py-1.5 border-b-2 border-dashed border-slate-300 space-y-2 print:space-y-1 text-[11px] print:text-[9pt]">
             <div className="flex justify-between">
               <span>Alokasi Syahriah (SPP):</span>
               <span className="font-semibold">{formatIDR(transaction.alokasi_syahriah)}</span>
@@ -252,17 +279,17 @@ _Harap simpan pesan kwitansi ini sebagai bukti pembayaran yang sah. Diterbitkan 
               <span>Alokasi Uang Makan:</span>
               <span className="font-semibold">{formatIDR(transaction.alokasi_makan)}</span>
             </div>
-            <div className="pt-2 border-t border-slate-200 flex justify-between font-bold text-xs text-slate-900">
+            <div className="pt-2 print:pt-1 border-t border-slate-200 flex justify-between font-bold text-xs print:text-[10pt] text-slate-900">
               <span>TOTAL DIBAYAR:</span>
-              <span className="text-sm">{formatIDR(transaction.nominal_bayar)}</span>
+              <span className="text-sm print:text-[10.5pt]">{formatIDR(transaction.nominal_bayar)}</span>
             </div>
-            <div className="flex justify-between text-[11px] text-slate-600">
+            <div className="flex justify-between text-[11px] print:text-[8.5pt] text-slate-600">
               <span>Sisa Tunggakan:</span>
               <span className={transaction.sisa_tunggakan > 0 ? 'font-bold text-red-600' : 'text-slate-700'}>
                 {formatIDR(transaction.sisa_tunggakan)}
               </span>
             </div>
-            <div className="flex justify-between text-[11px]">
+            <div className="flex justify-between text-[11px] print:text-[8.5pt]">
               <span>Status:</span>
               <span className={`font-bold uppercase ${transaction.status_bayar === 'Lunas' ? 'text-emerald-700' : 'text-amber-700'}`}>
                 {transaction.status_bayar}
@@ -271,10 +298,10 @@ _Harap simpan pesan kwitansi ini sebagai bukti pembayaran yang sah. Diterbitkan 
           </div>
 
           {/* Signatures / Footer */}
-          <div className="pt-4 flex justify-between items-end text-[10px] text-slate-600 font-sans">
+          <div className="pt-4 print:pt-2 flex justify-between items-end text-[10px] print:text-[8.5pt] text-slate-600 font-sans">
             <div className="text-center w-28">
               <p>Penyetor,</p>
-              <div className="h-12 flex items-center justify-center italic text-slate-400">
+              <div className="h-12 print:h-7 flex items-center justify-center italic text-slate-400">
                 ( Wali Santri )
               </div>
               <p className="border-t border-slate-300 pt-0.5">{transaction.santri?.nama_wali || 'Wali Santri'}</p>
@@ -286,10 +313,10 @@ _Harap simpan pesan kwitansi ini sebagai bukti pembayaran yang sah. Diterbitkan 
                 <img
                   src={settings.ttd_r2_url}
                   alt="TTD"
-                  className="h-10 mx-auto object-contain my-1"
+                  className="h-10 print:h-7 mx-auto object-contain my-1 print:my-0.5"
                 />
               ) : (
-                <div className="h-12 flex items-center justify-center italic text-slate-400">
+                <div className="h-12 print:h-7 flex items-center justify-center italic text-slate-400">
                   ( Tanda Tangan )
                 </div>
               )}
@@ -310,7 +337,7 @@ _Harap simpan pesan kwitansi ini sebagai bukti pembayaran yang sah. Diterbitkan 
             </button>
           </div>
 
-          <div className="mt-4 text-center text-[9px] text-slate-500 border-t border-dashed border-slate-200 pt-2 font-sans">
+          <div className="mt-4 print:mt-2 text-center text-[9px] print:text-[7.5pt] text-slate-500 border-t border-dashed border-slate-200 pt-2 print:pt-1 font-sans">
             Harap simpan struk kwitansi ini sebagai bukti pembayaran yang sah. Terima kasih.
           </div>
         </div>
